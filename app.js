@@ -129,7 +129,9 @@ function saveDemoDb(db) {
   localStorage.setItem('alhijr_demo_db', JSON.stringify(db));
 }
 
-function getDemoSlotsForDate(dateStr) {
+function ensureDemoAppointments(db) {
+  if (!db.appointments) db.appointments = [];
+
   const defaultSlots = [
     { start: '06:00', end: '08:00', name: 'فترة الصباح الأولى (06:00 ص - 08:00 ص)' },
     { start: '08:00', end: '10:00', name: 'فترة الصباح الثانية (08:00 ص - 10:00 ص)' },
@@ -140,29 +142,49 @@ function getDemoSlotsForDate(dateStr) {
     { start: '00:00', end: '02:00', name: 'فترة منتصف الليل (12:00 ص - 02:00 ص)' }
   ];
 
-  const db = getDemoDb();
-  let existing = db.appointments.filter(a => a.date === dateStr);
-  if (existing.length === 0) {
-    existing = defaultSlots.map((s, idx) => ({
-      id: `app_${dateStr}_${s.start.replace(':', '')}`,
-      date: dateStr,
-      start_time: s.start,
-      end_time: s.end,
-      capacity: 40,
-      booked_count: idx === 0 ? 40 : (idx === 1 ? 15 : 0),
-      is_active: true,
-      notes: s.name
-    }));
-    db.appointments.push(...existing);
-    saveDemoDb(db);
+  const now = new Date();
+  let changed = false;
+
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i, 12, 0, 0);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+
+    const exists = db.appointments.some(a => a.date === dateStr);
+    if (!exists) {
+      const daySlots = defaultSlots.map((s, idx) => ({
+        id: `app_${dateStr}_${s.start.replace(':', '')}`,
+        date: dateStr,
+        start_time: s.start,
+        end_time: s.end,
+        capacity: 40,
+        booked_count: (i === 0 && idx === 0) ? 40 : (i === 0 && idx === 1 ? 15 : 0),
+        is_active: true,
+        notes: s.name
+      }));
+      db.appointments.push(...daySlots);
+      changed = true;
+    }
   }
 
-  return existing.map(app => {
-    const remaining = Math.max(0, app.capacity - app.booked_count);
+  if (changed) {
+    saveDemoDb(db);
+  }
+}
+
+function getDemoSlotsForDate(dateStr) {
+  const db = getDemoDb();
+  ensureDemoAppointments(db);
+  const slots = db.appointments.filter(a => a.date === dateStr);
+  return slots.map(app => {
+    const remaining = Math.max(0, app.capacity - (app.booked_count || 0));
     return {
       ...app,
       remaining_capacity: remaining,
-      status: remaining <= 0 ? 'FULL' : 'AVAILABLE'
+      remaining_seats: remaining,
+      status: !app.is_active ? 'UNAVAILABLE' : (remaining <= 0 ? 'FULL' : 'AVAILABLE')
     };
   });
 }
@@ -170,16 +192,73 @@ function getDemoSlotsForDate(dateStr) {
 async function handleClientDemoApi(endpoint, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
   const db = getDemoDb();
+  ensureDemoAppointments(db);
   let body = {};
   if (options.body) {
     try { body = typeof options.body === 'string' ? JSON.parse(options.body) : options.body; } catch (e) {}
   }
 
-  // 1. GET /appointments
+  // 1a. GET /appointments/available-dates (جلب قائمة الأيام المتاحة للحجز)
+  if (endpoint.startsWith('/appointments/available-dates') && method === 'GET') {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+    const datesMap = {};
+    db.appointments.forEach(app => {
+      if (app.date >= todayStr) {
+        if (!datesMap[app.date]) {
+          datesMap[app.date] = {
+            date: app.date,
+            total_slots: 0,
+            available_slots: 0
+          };
+        }
+        datesMap[app.date].total_slots += 1;
+        const remaining = Math.max(0, app.capacity - (app.booked_count || 0));
+        if (app.is_active && remaining > 0) {
+          datesMap[app.date].available_slots += 1;
+        }
+      }
+    });
+
+    const dates = Object.values(datesMap).sort((a, b) => a.date.localeCompare(b.date));
+    return { success: true, dates };
+  }
+
+  // 1b. GET /appointments (جلب فترات يوم محدد أو جميع المواعيد)
   if (endpoint.startsWith('/appointments') && method === 'GET') {
     const url = new URL('http://dummy' + endpoint);
-    const dateStr = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
-    const appointments = getDemoSlotsForDate(dateStr);
+    const dateStr = url.searchParams.get('date');
+    const isAll = url.searchParams.get('all') === 'true';
+
+    let list = db.appointments;
+    if (dateStr) {
+      list = list.filter(a => a.date === dateStr);
+    } else if (!isAll) {
+      const now = new Date();
+      const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      list = list.filter(a => a.date === todayStr);
+    }
+
+    list.sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      const getHourSort = (t) => {
+        const h = parseInt((t || '00:00').split(':')[0], 10);
+        return h < 6 ? h + 24 : h;
+      };
+      return getHourSort(a.start_time) - getHourSort(b.start_time);
+    });
+
+    const appointments = list.map(app => {
+      const remaining = Math.max(0, app.capacity - (app.booked_count || 0));
+      return {
+        ...app,
+        remaining_capacity: remaining,
+        remaining_seats: remaining,
+        status: !app.is_active ? 'UNAVAILABLE' : (remaining <= 0 ? 'FULL' : 'AVAILABLE')
+      };
+    });
+
     return { success: true, count: appointments.length, appointments };
   }
 

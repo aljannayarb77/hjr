@@ -6,10 +6,16 @@ let selectedDate = null;
 let selectedAppointment = null;
 let confirmedBookingData = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
+function initBookingWizard() {
   setupEventListeners();
-  await loadAvailableDates();
-});
+  loadAvailableDates();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initBookingWizard);
+} else {
+  initBookingWizard();
+}
 
 // إعداد أحداث الأزرار والتنقل
 function setupEventListeners() {
@@ -84,7 +90,8 @@ async function loadAvailableDates() {
 
     container.innerHTML = '';
     data.dates.forEach((item, index) => {
-      const dateObj = new Date(item.date);
+      const parts = item.date.split('-');
+      const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
       const dayName = dateObj.toLocaleDateString('ar-SA', { weekday: 'short' });
       const dayNum = dateObj.getDate();
       const monthName = dateObj.toLocaleDateString('ar-SA', { month: 'short' });
@@ -108,7 +115,9 @@ async function loadAvailableDates() {
     });
 
     // اختيار أول يوم تلقائياً
-    selectDate(data.dates[0].date);
+    if (data.dates.length > 0) {
+      selectDate(data.dates[0].date);
+    }
   } catch (err) {
     showToast('فشل تحميل قائمة الأيام المتاحة.', 'error');
     container.innerHTML = '<div style="padding: 20px; color: var(--danger); text-align: center;">تعذر الاتصال بالخادم لجلب المواعيد.</div>';
@@ -121,7 +130,8 @@ async function selectDate(dateStr) {
   selectedAppointment = null;
   document.getElementById('btn-to-step-2').disabled = true;
 
-  const dateObj = new Date(dateStr);
+  const parts = dateStr.split('-');
+  const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
   const arabicDate = dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   document.getElementById('selected-date-heading').textContent = `مواعيد ${arabicDate}`;
 
@@ -224,7 +234,8 @@ function goToStep2() {
   }
 
   // تحديث نص الشريط الملخص
-  const dateObj = new Date(selectedAppointment.date);
+  const parts = (selectedAppointment.date || '').split('-');
+  const dateObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
   const arabicDate = dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   document.getElementById('banner-slot-text').textContent = 
     `${arabicDate} (${formatSlotRange(selectedAppointment.start_time, selectedAppointment.end_time)})`;
@@ -263,9 +274,10 @@ function goToStep3() {
   document.getElementById('rev-id').textContent = nationalId;
   document.getElementById('rev-persons').textContent = `${personsCount} أفراد`;
   
-  const dateObj = new Date(selectedAppointment.date);
+  const revParts = (selectedAppointment.date || '').split('-');
+  const revDateObj = new Date(parseInt(revParts[0], 10), parseInt(revParts[1], 10) - 1, parseInt(revParts[2], 10), 12, 0, 0);
   document.getElementById('rev-date').textContent = 
-    dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    revDateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   
   document.getElementById('rev-time').textContent = 
     `${formatSlotRange(selectedAppointment.start_time, selectedAppointment.end_time)} (ساعتان)`;
@@ -334,7 +346,8 @@ function renderConfirmedTicket(booking) {
   document.getElementById('ticket-name').textContent = booking.full_name;
   document.getElementById('ticket-persons').textContent = `${booking.persons_count} أفراد`;
   
-  const dateObj = new Date(app.date);
+  const dateParts = (app.date || '').split('-');
+  const dateObj = new Date(parseInt(dateParts[0], 10), parseInt(dateParts[1], 10) - 1, parseInt(dateParts[2], 10), 12, 0, 0);
   document.getElementById('ticket-date').textContent = 
     dateObj.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   
@@ -354,11 +367,13 @@ function handleShareTicket() {
 الوقت: ${formatSlotRange(app.start_time, app.end_time)} (مدة الزيارة: ساعتان)
 عدد الأفراد: ${confirmedBookingData.persons_count}`;
 
+  const ticketUrl = new URL(`ticket.html?ref=${confirmedBookingData.booking_ref}&token=${confirmedBookingData.qr_token}`, window.location.href).href;
+
   if (navigator.share) {
     navigator.share({
       title: 'تذكرة دخول الحِجر بالمسجد الحرام',
       text: shareText,
-      url: window.location.origin + `/ticket.html?ref=${confirmedBookingData.booking_ref}&token=${confirmedBookingData.qr_token}`
+      url: ticketUrl
     }).catch(() => {});
   } else {
     // فتح واتساب مباشرة
