@@ -1,16 +1,16 @@
 // Service Worker for Al-Hijr Reservations System
 const CACHE_NAME = 'alhijr-cache-v1';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/book.html',
-  '/ticket.html',
-  '/inquiry.html',
-  '/css/style.css',
-  '/css/ticket.css',
-  '/js/app.js',
-  '/assets/logo.svg',
-  '/manifest.json'
+  './',
+  'index.html',
+  'book.html',
+  'ticket.html',
+  'inquiry.html',
+  'css/style.css',
+  'css/ticket.css',
+  'js/app.js',
+  'assets/logo.svg',
+  'manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
