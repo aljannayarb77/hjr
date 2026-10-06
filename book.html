@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>حجز موعد جديد | منصة مواعيد الحِجر</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ticket.css">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0D3B2E">
+</head>
+<body>
+
+  <!-- التنبيه الرسمي -->
+  <div class="disclaimer-banner" role="alert">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span>نموذج مستقل لتنظيم الحجوزات، وليس موقعاً حكومياً رسمياً.</span>
+  </div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo">
+          <div class="brand-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 21V10a8 8 0 0 1 16 0v11"/>
+              <path d="M9 21v-7a3 3 0 0 1 6 0v7"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">مواعيد الحِجر</span>
+            <span class="brand-subtitle">حجز موعد دخول جديد</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">الرئيسية</a></li>
+          <li><a href="book.html" class="nav-link active">حجز موعد</a></li>
+          <li><a href="inquiry.html" class="nav-link">الاستعلام عن حجز</a></li>
+          <li><a href="index.html#instructions" class="nav-link">التعليمات</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <button id="btn-toggle-theme" class="btn btn-secondary btn-sm" title="تبديل المظهر">🌙 الوضع الداكن</button>
+          <a href="inquiry.html" class="btn btn-secondary btn-sm">الاستعلام</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Booking Wizard Area -->
+  <main style="padding: 40px 0 80px; flex: 1;">
+    <div class="container-sm">
+
+      <!-- مؤشر التقدم (Progress Indicator) -->
+      <div class="wizard-progress">
+        <div class="progress-step active" id="prog-step-1" data-step="1">
+          <div class="step-circle">1</div>
+          <span class="step-label">اختيار الموعد</span>
+        </div>
+        <div class="progress-step" id="prog-step-2" data-step="2">
+          <div class="step-circle">2</div>
+          <span class="step-label">بيانات الزائر</span>
+        </div>
+        <div class="progress-step" id="prog-step-3" data-step="3">
+          <div class="step-circle">3</div>
+          <span class="step-label">تأكيد الحجز</span>
+        </div>
+        <div class="progress-step" id="prog-step-4" data-step="4">
+          <div class="step-circle">4</div>
+          <span class="step-label">التذكرة و QR</span>
+        </div>
+      </div>
+
+      <!-- الحاوية البيضاء للمحتوى -->
+      <div class="booking-card">
+
+        <!-- ================= المرحلة 1: اختيار الموعد ================= -->
+        <section id="step-1" class="wizard-content">
+          <div style="margin-bottom: 24px; text-align: center;">
+            <h2 style="font-size: 1.7rem; margin-bottom: 6px;">اختر التاريخ والموعد المناسب</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">اختر اليوم لعرض الفترات الزمنية المتاحة وعدد المقاعد المتبقية في كل فترة.</p>
+          </div>
+
+          <!-- شريط الأيام المتاحة (Date Chips) -->
+          <div class="date-selector-wrap">
+            <label class="form-label">الأيام المتاحة للحجز:</label>
+            <div id="date-chips-container" class="date-chips">
+              <div style="text-align: center; width: 100%; padding: 20px; color: var(--text-muted);">
+                جاري تحميل المواعيد المتاحة...
+              </div>
+            </div>
+          </div>
+
+          <!-- شبكة المواعيد لليوم المحدد -->
+          <div style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="font-size: 1.25rem;" id="selected-date-heading">فترات المواعيد</h3>
+              <span id="slots-count-badge" class="badge badge-info">0 مواعيد</span>
+            </div>
+
+            <div id="slots-grid-container" class="slots-grid">
+              <!-- يتم توليد البطاقات ديناميكياً -->
+            </div>
+          </div>
+
+          <div style="margin-top: 36px; display: flex; justify-content: flex-end;">
+            <button id="btn-to-step-2" class="btn btn-primary btn-lg" disabled>
+              <span>المتابعة لإدخال البيانات</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================= المرحلة 2: إدخال البيانات ================= -->
+        <section id="step-2" class="wizard-content" style="display: none;">
+          <div style="margin-bottom: 24px;">
+            <h2 style="font-size: 1.7rem; margin-bottom: 6px;">بيانات الزائر والمرافقين</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">يرجى كتابة البيانات بدقة كما هي مسجلة في الهوية أو جواز السفر لضمان قبول التذكرة.</p>
+          </div>
+
+          <!-- بطاقة تلخيص الموعد المختار -->
+          <div id="selected-slot-summary-banner" style="background: var(--gold-subtle); border: 1px solid var(--gold-light); padding: 16px 20px; border-radius: var(--radius-md); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-size: 0.85rem; color: var(--gold-dark); font-weight: 700; display: block;">الموعد المختار:</span>
+              <strong id="banner-slot-text" style="color: var(--primary); font-size: 1.1rem;">-</strong>
+            </div>
+            <button type="button" id="btn-change-slot" class="btn btn-secondary btn-sm" style="font-size: 0.85rem;">تغيير الموعد</button>
+          </div>
+
+          <form id="booking-form">
+            <div class="form-group">
+              <label for="full_name" class="form-label">
+                <span class="required">*</span> الاسم الكامل (ثلاثي أو رباعي):
+              </label>
+              <input type="text" id="full_name" class="form-control" placeholder="مثال: مروج يعقوب الغامدي" required minlength="3">
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="phone" class="form-label">
+                  <span class="required">*</span> رقم الجوال (للتواصل واستعلام التذكرة):
+                </label>
+                <input type="tel" id="phone" class="form-control" placeholder="05xxxxxxxx أو مع المفتاح الدولي" required>
+              </div>
+
+              <div class="form-group">
+                <label for="email" class="form-label">
+                  البريد الإلكتروني (اختياري):
+                </label>
+                <input type="email" id="email" class="form-control" placeholder="name@example.com">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="national_id" class="form-label">
+                  <span class="required">*</span> رقم الهوية الوطنية / الإقامة / جواز السفر:
+                </label>
+                <input type="text" id="national_id" class="form-control" placeholder="رقم الوثيقة الرسمية" required minlength="5">
+              </div>
+
+              <div class="form-group">
+                <label for="nationality" class="form-label">
+                  الجنسية:
+                </label>
+                <select id="nationality" class="form-control">
+                  <option value="سعودي" selected>سعودي</option>
+                  <option value="خليجي">مواطن دول مجلس التعاون</option>
+                  <option value="مقيم بالمملكة">مقيم داخل المملكة</option>
+                  <option value="معتمر / زائر دولي">معتمر / زائر دولي</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="persons_count" class="form-label">
+                <span class="required">*</span> عدد الأفراد في هذا الحجز:
+              </label>
+              <select id="persons_count" class="form-control" style="font-weight: 700;">
+                <option value="1">فرد واحد (أنا فقط)</option>
+                <option value="2">شخصان (2)</option>
+                <option value="3">3 أشخاص</option>
+                <option value="4">4 أشخاص</option>
+                <option value="5">5 أشخاص (الحد الأقصى للطلب)</option>
+              </select>
+              <small style="color: var(--text-muted); font-size: 0.82rem; margin-top: 4px; display: block;">
+                ملاحظة: يشترط حضور جميع المرافقين برفقة صاحب الحجز في نفس الوقت.
+              </small>
+            </div>
+
+            <div style="margin-top: 32px; display: flex; justify-content: space-between;">
+              <button type="button" id="btn-back-to-step-1" class="btn btn-secondary btn-lg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+                <span>السابق</span>
+              </button>
+              <button type="button" id="btn-to-step-3" class="btn btn-primary btn-lg">
+                <span>مراجعة وتأكيد البيانات</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="19" y1="12" x2="5" y2="12"/>
+                  <polyline points="12 19 5 12 12 5"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ================= المرحلة 3: المراجعة والإقرار ================= -->
+        <section id="step-3" class="wizard-content" style="display: none;">
+          <div style="margin-bottom: 24px; text-align: center;">
+            <h2 style="font-size: 1.7rem; margin-bottom: 6px;">مراجعة الحجز والإقرار</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">يرجى مراجعة تفاصيل الحجز بعناية قبل الإصدار النهائي للتذكرة الإلكترونية.</p>
+          </div>
+
+          <!-- جدول ملخص الحجز -->
+          <div style="background: var(--bg-page); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: 24px; margin-bottom: 28px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: block;">الاسم الكامل:</span>
+                <strong id="rev-name" style="color: var(--primary); font-size: 1.1rem;">-</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: block;">رقم الجوال:</span>
+                <strong id="rev-phone" style="direction: ltr; display: inline-block; color: var(--primary); font-size: 1.1rem;">-</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: block;">رقم الهوية / الوثيقة:</span>
+                <strong id="rev-id" style="color: var(--primary); font-size: 1.1rem;">-</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: block;">عدد الأفراد:</span>
+                <strong id="rev-persons" style="color: var(--primary); font-size: 1.1rem;">-</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: block;">تاريخ الزيارة:</span>
+                <strong id="rev-date" style="color: var(--primary); font-size: 1.1rem;">-</strong>
+              </div>
+              <div>
+                <span style="font-size: 0.82rem; color: var(--text-muted); display: block;">فترة الموعد:</span>
+                <strong id="rev-time" style="color: var(--primary); font-size: 1.1rem;">-</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- شروط الإقرار -->
+          <div style="margin-bottom: 28px;">
+            <label class="form-check">
+              <input type="checkbox" id="chk-accurate" required>
+              <span class="form-check-label">
+                <strong>أقر بصحة البيانات:</strong> أقر بأن جميع البيانات المدخلة صحيحة ومطابقة للوثائق الرسمية.
+              </span>
+            </label>
+
+            <label class="form-check">
+              <input type="checkbox" id="chk-terms" required>
+              <span class="form-check-label">
+                <strong>الموافقة على التعليمات:</strong> أتعهد بالحضور قبل الموعد بـ 15 دقيقة، وإبراز الرمز QR للمنظمين، والالتزام بآداب المسجد الحرام.
+              </span>
+            </label>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" id="btn-back-to-step-2" class="btn btn-secondary btn-lg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 5"/>
+              </svg>
+              <span>تعديل البيانات</span>
+            </button>
+
+            <button type="button" id="btn-confirm-booking" class="btn btn-gold btn-lg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span>تأكيد الحجز وإصدار التذكرة</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- ================= المرحلة 4: التذكرة الإلكترونية ================= -->
+        <section id="step-4" class="wizard-content" style="display: none;">
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div style="width: 64px; height: 64px; background: var(--success-bg); color: var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; border: 2px solid var(--success-border);">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <h2 style="font-size: 1.8rem; color: var(--success); margin-bottom: 6px;">تم تأكيد حجزك بنجاح!</h2>
+            <p style="color: var(--text-muted); font-size: 1rem;">احتفظ بالتذكرة الإلكترونية وأبرز الرمز QR عند الوصول إلى البوابة.</p>
+          </div>
+
+          <!-- بطاقة التذكرة الإلكترونية المعروضة -->
+          <div class="ticket-wrapper">
+            <div class="ticket-pass" id="printable-ticket">
+              <div class="pass-header">
+                <span class="logo-badge">دخول الحِجر - تذكرة إلكترونية</span>
+                <h2>حِجر إسماعيل (المسجد الحرام)</h2>
+                <div class="pass-ref-tag" id="ticket-booking-ref">HJ-2026-0000</div>
+              </div>
+
+              <div class="pass-body">
+                <div class="pass-qr-box">
+                  <img id="ticket-qr-img" src="" alt="QR Code الحجز">
+                  <span class="pass-qr-caption">امسح الرمز عند نقطة الدخول</span>
+                </div>
+
+                <div class="pass-info-grid">
+                  <div class="pass-info-cell">
+                    <span class="title">اسم صاحب الحجز</span>
+                    <span class="val" id="ticket-name">-</span>
+                  </div>
+                  <div class="pass-info-cell">
+                    <span class="title">عدد الأفراد</span>
+                    <span class="val" id="ticket-persons">-</span>
+                  </div>
+                  <div class="pass-info-cell">
+                    <span class="title">تاريخ الزيارة</span>
+                    <span class="val" id="ticket-date">-</span>
+                  </div>
+                  <div class="pass-info-cell">
+                    <span class="title">وقت الدخول</span>
+                    <span class="val" id="ticket-time">-</span>
+                  </div>
+                  <div class="pass-info-cell">
+                    <span class="title">رقم الجوال</span>
+                    <span class="val" id="ticket-phone" style="direction: ltr; display: inline-block;">-</span>
+                  </div>
+                  <div class="pass-info-cell">
+                    <span class="title">حالة التذكرة</span>
+                    <span class="val" id="ticket-status"><span class="badge badge-success">مؤكد ✓</span></span>
+                  </div>
+                </div>
+
+                <div class="pass-divider">
+                  <span class="cut-right"></span>
+                  <span class="cut-left"></span>
+                </div>
+
+                <div class="pass-notes" style="margin-top: 16px;">
+                  <strong>تنبيهات الدخول:</strong>
+                  يرجى الحضور قبل الموعد بـ 15 دقيقة، وإبراز هذا الرمز لموظف التفويج. الرمز صالح لمرة واحدة فقط للدخول.
+                </div>
+              </div>
+            </div>
+
+            <!-- أزرار الإجراءات على التذكرة -->
+            <div class="pass-btn-group" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px;">
+              <button type="button" id="btn-download-ticket" class="btn btn-gold" style="flex: 1;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                <span>تحميل كصورة</span>
+              </button>
+
+              <button type="button" id="btn-print-ticket" class="btn btn-primary" style="flex: 1;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                <span>طباعة التذكرة</span>
+              </button>
+
+              <button type="button" id="btn-share-ticket" class="btn btn-secondary" style="flex: 1;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="18" cy="5" r="3"/>
+                  <circle cx="6" cy="12" r="3"/>
+                  <circle cx="18" cy="19" r="3"/>
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                </svg>
+                <span>مشاركة الحجز</span>
+              </button>
+
+              <a href="index.html" class="btn btn-outline-gold" style="width: 100%; text-align: center;">
+                <span>العودة للرئيسية</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script src="js/booking-wizard.js"></script>
+</body>
+</html>

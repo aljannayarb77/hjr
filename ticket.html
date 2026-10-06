@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التذكرة الإلكترونية لدخول الحِجر | المسجد الحرام</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/ticket.css">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0D3B2E">
+</head>
+<body style="background: #F1F4EE;">
+
+  <!-- التنبيه الرسمي -->
+  <div class="disclaimer-banner no-print" role="alert">
+    <span>تنبيه: نموذج مستقل لتنظيم الحجوزات، وليس موقعاً حكومياً رسمياً.</span>
+  </div>
+
+  <header class="site-header no-print">
+    <div class="container">
+      <nav class="navbar" style="height: 64px;">
+        <a href="index.html" class="brand-logo" style="font-size: 1.15rem;">
+          <div class="brand-icon" style="width: 38px; height: 38px;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 21V10a8 8 0 0 1 16 0v11"/>
+              <path d="M9 21v-7a3 3 0 0 1 6 0v7"/>
+            </svg>
+          </div>
+          <span>مواعيد الحِجر</span>
+        </a>
+
+        <div class="nav-actions">
+          <button id="btn-toggle-theme" class="btn btn-secondary btn-sm" title="تبديل المظهر">🌙 الوضع الداكن</button>
+          <a href="index.html" class="btn btn-secondary btn-sm">الرئيسية</a>
+          <button onclick="window.print()" class="btn btn-primary btn-sm">طباعة</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main style="padding: 20px 0 60px;">
+    <div class="ticket-container">
+
+      <div id="loading-state" style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+        <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">جاري تحميل التذكرة الإلكترونية...</div>
+      </div>
+
+      <div id="error-state" style="display: none; background: #FFFFFF; border-radius: var(--radius-md); padding: 40px 20px; text-align: center; border: 1.5px solid var(--danger-border);">
+        <div style="font-size: 2.5rem; color: var(--danger); margin-bottom: 12px;">✕</div>
+        <h3 style="color: var(--danger); font-size: 1.3rem; margin-bottom: 8px;">تعذر العثور على التذكرة</h3>
+        <p style="color: var(--text-muted); margin-bottom: 24px;">الرابط غير صحيح أو قد تم إلغاء الحجز.</p>
+        <a href="inquiry.html" class="btn btn-primary">الاستعلام برقم الجوال والحجز</a>
+      </div>
+
+      <!-- بطاقة التذكرة الكاملة -->
+      <div id="ticket-content" style="display: none;">
+        <div class="ticket-pass">
+          <div class="pass-header">
+            <span class="logo-badge">تذكرة إلكترونية رسمية</span>
+            <h2>حِجر إسماعيل - المسجد الحرام</h2>
+            <div class="pass-ref-tag" id="pass-ref">-</div>
+          </div>
+
+          <div class="pass-body">
+            <div class="pass-qr-box">
+              <img id="pass-qr" src="" alt="رمز QR">
+              <span class="pass-qr-caption" id="pass-status-caption">رمز التحقق الإلكتروني</span>
+            </div>
+
+            <div class="pass-info-grid">
+              <div class="pass-info-cell">
+                <span class="title">اسم الزائر</span>
+                <span class="val" id="pass-name">-</span>
+              </div>
+              <div class="pass-info-cell">
+                <span class="title">عدد الأفراد</span>
+                <span class="val" id="pass-persons">-</span>
+              </div>
+              <div class="pass-info-cell">
+                <span class="title">تاريخ الموعد</span>
+                <span class="val" id="pass-date">-</span>
+              </div>
+              <div class="pass-info-cell">
+                <span class="title">وقت الموعد</span>
+                <span class="val" id="pass-time">-</span>
+              </div>
+              <div class="pass-info-cell">
+                <span class="title">الهوية / الوثيقة</span>
+                <span class="val" id="pass-id">-</span>
+              </div>
+              <div class="pass-info-cell">
+                <span class="title">حالة التذكرة</span>
+                <span class="val" id="pass-status">-</span>
+              </div>
+            </div>
+
+            <div class="pass-divider">
+              <span class="cut-right"></span>
+              <span class="cut-left"></span>
+            </div>
+
+            <div class="pass-notes" style="margin-top: 16px;">
+              <strong>تعليمات الحضور:</strong>
+              يرجى التواجد بالقرب من مدخل الحِجر قبل الموعد بـ 15 دقيقة، وإبراز هذا الرمز للموظف المختص.
+            </div>
+          </div>
+        </div>
+
+        <div class="pass-btn-group no-print" style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <button id="btn-download-img" class="btn btn-gold" style="flex: 1; min-width: 140px;">
+            حفظ كصورة (PNG)
+          </button>
+          <button onclick="window.print()" class="btn btn-primary" style="flex: 1; min-width: 140px;">
+            طباعة التذكرة
+          </button>
+          <a href="inquiry.html" class="btn btn-secondary" style="flex: 1; min-width: 140px; text-align: center;">
+            الاستعلام / إلغاء
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get('ref');
+
+      if (!ref) {
+        showError();
+        return;
+      }
+
+      try {
+        const data = await apiRequest(`/bookings/${ref}`);
+        if (data.success && data.booking) {
+          render(data.booking);
+        } else {
+          showError();
+        }
+      } catch (e) {
+        showError();
+      }
+    });
+
+    function showError() {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+    }
+
+    function render(b) {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('ticket-content').style.display = 'block';
+
+      const app = b.appointment || {};
+      document.getElementById('pass-ref').textContent = b.booking_ref;
+      document.getElementById('pass-qr').src = b.qr_image;
+      document.getElementById('pass-name').textContent = b.full_name;
+      document.getElementById('pass-persons').textContent = `${b.persons_count} أفراد`;
+      document.getElementById('pass-id').textContent = b.national_id;
+
+      if (app.date) {
+        const d = new Date(app.date);
+        document.getElementById('pass-date').textContent = d.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('pass-time').textContent = formatSlotRange(app.start_time, app.end_time);
+      } else {
+        document.getElementById('pass-date').textContent = '-';
+        document.getElementById('pass-time').textContent = '-';
+      }
+
+      document.getElementById('pass-status').innerHTML = getStatusBadge(b.status);
+      if (b.status === 'USED') {
+        document.getElementById('pass-status-caption').textContent = 'تم استخدام هذه التذكرة مسبقاً والدخول بها';
+      } else if (b.status === 'CANCELLED') {
+        document.getElementById('pass-status-caption').textContent = 'هذه التذكرة ملغاة ✕';
+      }
+
+      // تجهيز زر تحميل التذكرة كصورة
+      const dlBtn = document.getElementById('btn-download-img');
+      if (dlBtn) {
+        dlBtn.onclick = () => {
+          const dateStr = app.date ? new Date(app.date).toLocaleDateString('ar-SA') : '-';
+          const timeStr = app.start_time ? formatSlotRange(app.start_time, app.end_time) : '-';
+          downloadTicketCanvas(
+            b.booking_ref,
+            b.full_name,
+            dateStr,
+            timeStr,
+            b.persons_count,
+            b.qr_image
+          );
+        };
+      }
+    }
+  </script>
+</body>
+</html>

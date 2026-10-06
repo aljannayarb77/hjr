@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة تنظيم مواعيد دخول الحِجر | المسجد الحرام</title>
+  <meta name="description" content="منصة تنظيم وحجز مواعيد دخول الحِجر في المسجد الحرام مع التذاكر الإلكترونية ورمز QR الفوري">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0D3B2E">
+</head>
+<body>
+
+  <!-- التنبيه وإخلاء المسؤولية القانوني -->
+  <div class="disclaimer-banner" role="alert">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    <span class="disclaimer-text">
+      <strong>تنبيه وإخلاء مسؤولية:</strong> هذا النظام نموذج مستقل لتنظيم الحجوزات والتفويج، وليس جهة حكومية رسمية ولا يُعد بديلاً عن التصاريح الرسمية المعتمدة (مثل منصة نسك أو وزارة الحج والعمرة).
+    </span>
+  </div>
+
+  <!-- ترويسة الموقع -->
+  <header class="site-header">
+    <div class="container">
+      <nav class="navbar">
+        <a href="index.html" class="brand-logo" aria-label="الرئيسية">
+          <div class="brand-icon">
+            <!-- أيقونة محراب وقوس إسلامي فخم -->
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 21V10a8 8 0 0 1 16 0v11"/>
+              <path d="M9 21v-7a3 3 0 0 1 6 0v7"/>
+              <path d="M12 3v3"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-title">مواعيد الحِجر</span>
+            <span class="brand-subtitle">نظام التنظيم والحجز الإلكتروني</span>
+          </div>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link active">الرئيسية</a></li>
+          <li><a href="book.html" class="nav-link">حجز موعد</a></li>
+          <li><a href="inquiry.html" class="nav-link">الاستعلام عن حجز</a></li>
+          <li><a href="#steps" class="nav-link">طريقة الحجز</a></li>
+          <li><a href="#instructions" class="nav-link">التعليمات</a></li>
+          <li><a href="#faq" class="nav-link">الأسئلة الشائعة</a></li>
+          <li><a href="#contact" class="nav-link">تواصل معنا</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <button id="btn-toggle-theme" class="btn btn-secondary btn-sm" title="تبديل المظهر">
+            🌙 الوضع الداكن
+          </button>
+          <a href="login.html" class="btn btn-secondary btn-sm" title="دخول المسؤولين والموظفين">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span>دخول الإدارة</span>
+          </a>
+          <button class="mobile-toggle" aria-label="فتح القائمة">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- القسم الترحيبي (Hero Section) -->
+  <section class="hero-section">
+    <div class="hero-pattern"></div>
+    <div class="container">
+      <div class="hero-badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+        <span>خدمة إلكترونية ميسرة للزوار والمعتمرين</span>
+      </div>
+
+      <h1 class="hero-title">
+        احجز موعدك لدخول <span>حِجر إسماعيل</span>
+      </h1>
+      
+      <p class="hero-subtitle">
+        اختر اليوم والموعد المناسب لك ولدخول مرافقيك بكل يسر، واحصل على تذكرتك الإلكترونية المزودة برمز QR فريد لتنظيم الدخول بسلاسة وسكينة.
+      </p>
+
+      <div class="hero-cta">
+        <a href="book.html" class="btn btn-gold btn-lg">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>ابدأ الحجز الآن</span>
+        </a>
+        <a href="inquiry.html" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <span>الاستعلام عن حجز</span>
+        </a>
+      </div>
+
+      <!-- ميزات سريعة -->
+      <div class="hero-features-bar">
+        <div class="hero-feature-card">
+          <div class="feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <div>
+            <h4>تذكرة إلكترونية بـ QR</h4>
+            <p>رمز تحقق رقمي فريد يظهر على شاشة هاتفك مباشرة</p>
+          </div>
+        </div>
+
+        <div class="hero-feature-card">
+          <div class="feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <h4>تنظيم المواعيد والسعة</h4>
+            <p>منع الازدحام وتفويج منظم لضمان راحة وخشوع المصلين</p>
+          </div>
+        </div>
+
+        <div class="hero-feature-card">
+          <div class="feat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <div>
+            <h4>سهولة الاستخدام</h4>
+            <p>واجهة مريحة ومناسبة لكبار السن وجميع الزوار</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم طريقة الحجز (Steps) -->
+  <section id="steps" class="steps-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">خطوات ميسرة</span>
+        <h2 class="section-title">كيف يتم حجز موعدك؟</h2>
+        <p class="section-desc">أربع خطوات سريعة وسهلة تمكنك من تأكيد الموعد واستلام تذكرتك الرقمية مباشرة.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <span class="step-number">1</span>
+          <div class="step-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <h3 class="step-title">اختيار التاريخ والموعد</h3>
+          <p class="step-desc">تصفح التقويم التفاعلي واختر الفترة الزمنية المناسبة من بين المواعيد المتاحة.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">2</span>
+          <div class="step-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h3 class="step-title">إدخال بيانات الزائر</h3>
+          <p class="step-desc">اكتب اسمك ورقم جوالك ورقم الهوية وعدد الأفراد بوضوح وسهولة.</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">3</span>
+          <div class="step-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+          </div>
+          <h3 class="step-title">المراجعة والتأكيد</h3>
+          <p class="step-desc">راجع بيانات الموعد واطلع على التعليمات ثم اضغط زر "تأكيد الحجز".</p>
+        </div>
+
+        <div class="step-card">
+          <span class="step-number">4</span>
+          <div class="step-icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <h3 class="step-title">استلام تذكرة الـ QR</h3>
+          <p class="step-desc">احصل فورًا على تذكرتك الإلكترونية واحتفظ بها لعرضها للموظف عند البوابة.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم التعليمات والتنبيهات (Guidelines) -->
+  <section id="instructions" class="instructions-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">ضوابط الحضور</span>
+        <h2 class="section-title">تعليمات وإرشادات هامة للزوار</h2>
+        <p class="section-desc">لضمان سلامتكم وتيسير دخولكم، يرجى الالتزام بالتعليمات التالية أثناء الزيارة.</p>
+      </div>
+
+      <div class="guidelines-grid">
+        <div class="guideline-card">
+          <div class="guideline-icon">⏱️</div>
+          <div class="guideline-content">
+            <h4>الحضور في الوقت المحدد</h4>
+            <p>يرجى التواجد بالقرب من مدخل الحِجر قبل موعدك بـ 15 دقيقة لتسهيل عملية التحقق من التذكرة والتفويج.</p>
+          </div>
+        </div>
+
+        <div class="guideline-card">
+          <div class="guideline-icon">📱</div>
+          <div class="guideline-content">
+            <h4>إبراز رمز QR الإلكتروني</h4>
+            <p>يجب إبراز التذكرة على شاشة الهاتف أو مطبوعة لموظف التنظيم عند نقطة الدخول لمسح الرمز.</p>
+          </div>
+        </div>
+
+        <div class="guideline-card">
+          <div class="guideline-icon">🪪</div>
+          <div class="guideline-content">
+            <h4>تطابق بيانات الهوية</h4>
+            <p>يرجى التأكد من صحة رقم الهوية أو جواز السفر، حيث قد يُطلب مطابقتها عند الدخول.</p>
+          </div>
+        </div>
+
+        <div class="guideline-card">
+          <div class="guideline-icon">👥</div>
+          <div class="guideline-content">
+            <h4>دخول المرافقين معاً</h4>
+            <p>إذا كان الحجز يشمل أكثر من فرد، فيجب حضور جميع الأفراد مع حامل التذكرة للدخول في نفس اللحظة.</p>
+          </div>
+        </div>
+
+        <div class="guideline-card">
+          <div class="guideline-icon">🕋</div>
+          <div class="guideline-content">
+            <h4>السكينة والهدوء</h4>
+            <p>الحِجر جزء من الكعبة المشرفة، يُرجى مراعاة قدسية المكان وتجنب التدافع أو رفع الأصوات أو التصوير المعطل للحركة.</p>
+          </div>
+        </div>
+
+        <div class="guideline-card">
+          <div class="guideline-icon">🚫</div>
+          <div class="guideline-content">
+            <h4>سياسة الاستخدام الفردي</h4>
+            <p>رمز QR مخصص للاستخدام لمرة واحدة فقط، ويلغى تلقائيًا بعد المسح ولا يمكن مشاركته أو إعادة استخدامه.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- قسم الأسئلة الشائعة (FAQ) -->
+  <section id="faq" class="faq-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">استفسارات الزوار</span>
+        <h2 class="section-title">الأسئلة الشائعة</h2>
+        <p class="section-desc">إجابات واضحة ومباشرة عن أبرز الأسئلة المتكررة حول نظام الحجز والتذاكر.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item active">
+          <button class="faq-question">
+            <span>هل الحجز في هذه المنصة مجاني؟</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            نعم، حجز المواعيد وتنظيم الدخول متاح بشكل مجاني بالكامل لكافة الزوار والمعتمرين.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>كيف يمكنني استعادة تذكرتي إذا أغلقت الصفحة؟</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            يمكنك الدخول إلى صفحة "الاستعلام عن حجز" من القائمة العلوية، وإدخال رقم الحجز (مثل HJ-2026-1001) ورقم جوالك المسجل، وستظهر تذكرتك ورمز الـ QR مباشرة.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>هل يمكنني إلغاء الحجز في حال طرأ ظرف؟</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            نعم، يمكنك إلغاء الحجز من صفحة الاستعلام قبل الموعد بساعتين على الأقل لإتاحة المقعد لزائر آخر.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>هل تكفي التذكرة الإلكترونية على الجوال دون طباعتها؟</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            نعم، التذكرة الرقمية مصممة خصيصًا لتكون متوافقة مع شاشات الجوال، ويمكن لموظف البوابة مسح رمز QR مباشرة من شاشة هاتفك.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span>هل هذا الموقع يتبع جهة حكومية رسمية؟</span>
+            <span class="faq-chevron">▼</span>
+          </button>
+          <div class="faq-answer">
+            هذه المنصة نموذج تنظيمي تقني مستقل لإدارة المواعيد والتفويج، وليست تابعة لوزارة الحج والعمرة أو الهيئة العامة لشؤون المسجد الحرام، ولا تصدر تصاريح حكومية رسمية ما لم يتم ربطها واعتمادها رسميًا.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- التذييل (Footer) -->
+  <footer id="contact" class="site-footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand-logo" style="color: #FFFFFF;">
+            <div class="brand-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 21V10a8 8 0 0 1 16 0v11"/>
+                <path d="M9 21v-7a3 3 0 0 1 6 0v7"/>
+              </svg>
+            </div>
+            <span style="font-size: 1.25rem;">منصة حجز الحِجر</span>
+          </div>
+          <p>
+            نظام تقني مستقل مخصص لتنظيم مواعيد وتفويج زوار حِجر إسماعيل بالمسجد الحرام، بهدف تيسير الدخول وإصدار التذاكر الإلكترونية بـ QR Code.
+          </p>
+        </div>
+
+        <div class="footer-links">
+          <h4>روابط سريعة</h4>
+          <ul class="footer-nav">
+            <li><a href="index.html">الصفحة الرئيسية</a></li>
+            <li><a href="book.html">حجز موعد جديد</a></li>
+            <li><a href="inquiry.html">الاستعلام عن حجز</a></li>
+            <li><a href="scanner.html">ماسح التذاكر (للموظف)</a></li>
+            <li><a href="admin.html">لوحة تحكم الإدارة</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>معلومات هامة</h4>
+          <ul class="footer-nav">
+            <li><a href="#steps">طريقة الحجز</a></li>
+            <li><a href="#instructions">إرشادات الزيارة</a></li>
+            <li><a href="#faq">الأسئلة الشائعة</a></li>
+            <li><a href="terms.html">الشروط والأحكام</a></li>
+            <li><a href="privacy.html">سياسة الخصوصية</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-contact">
+          <h4>تواصل ودعم</h4>
+          <p>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            <span>الهاتف: 920000000 (تجريبي)</span>
+          </p>
+          <p>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+              <polyline points="22,6 12,13 2,6"/>
+            </svg>
+            <span>البريد: support@alhijr.local</span>
+          </p>
+          <p>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C5A059" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+            <span>مكة المكرمة، المملكة العربية السعودية</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-disclaimer-box">
+        <strong>إخلاء مسؤولية تنظيمي:</strong>
+        هذا الموقع نظام تجريبي ونموذج لتنظيم حجز المواعيد وإصدار التذاكر الإلكترونية، ولا يتبع أي جهة حكومية أو رسمية ما لم يصدر ربط واعتماد رسمي مع الجهات المعنية.
+      </div>
+
+      <div class="footer-bottom">
+        <p>© 2026 منصة تنظيم مواعيد دخول الحِجر. جميع الحقوق محفوظة.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    // تفعيل فتح وإغلاق عناصر الأكورديون في الأسئلة الشائعة
+    document.querySelectorAll('.faq-question').forEach(button => {
+      button.addEventListener('click', () => {
+        const item = button.parentElement;
+        const isActive = item.classList.contains('active');
+        document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+        if (!isActive) item.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

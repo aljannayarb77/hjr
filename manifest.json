@@ -1,0 +1,21 @@
+{
+  "name": "تنظيم حجز دخول الحِجر - المسجد الحرام",
+  "short_name": "حجز الحِجر",
+  "description": "منصة إلكترونية ذكية لتنظيم وتفويج مواعيد زيارة حِجر إسماعيل وإصدار التذاكر الرقمية الموثقة برمز QR",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0D3B2E",
+  "theme_color": "#0D3B2E",
+  "orientation": "portrait-primary",
+  "dir": "rtl",
+  "lang": "ar",
+  "icons": [
+    {
+      "src": "/assets/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

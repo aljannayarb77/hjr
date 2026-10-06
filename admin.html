@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة تحكم الإدارة | منصة تنظيم مواعيد الحِجر</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0D3B2E">
+  <style>
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      min-height: calc(100vh - 76px);
+    }
+    .admin-sidebar {
+      background: var(--primary-dark);
+      color: #FFFFFF;
+      padding: 24px 16px;
+      border-left: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .admin-user-card {
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid rgba(197, 160, 89, 0.3);
+    }
+    .admin-user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .admin-menu {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .admin-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .admin-menu-item:hover, .admin-menu-item.active {
+      background: var(--primary-light);
+      color: #FFFFFF;
+    }
+    .admin-menu-item.active {
+      border-right: 4px solid var(--gold);
+    }
+    .admin-content {
+      padding: 32px;
+      background: #F8F9F5;
+      overflow-y: auto;
+    }
+    .stats-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+    .stat-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+    }
+    .stat-val {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+    }
+    .stat-title {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .data-table-container {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 0.92rem;
+    }
+    .data-table th {
+      background: #F1F4EE;
+      color: var(--primary);
+      padding: 14px 16px;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .data-table tr:hover {
+      background: #FAFBF9;
+    }
+    .chart-container {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow-sm);
+    }
+    .simple-bar-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      height: 180px;
+      padding-top: 20px;
+      border-bottom: 2px solid var(--border);
+    }
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+    }
+    .bar-rect {
+      width: 100%;
+      max-width: 48px;
+      background: linear-gradient(180deg, var(--gold), var(--primary));
+      border-radius: 6px 6px 0 0;
+      transition: height 0.5s ease;
+      min-height: 6px;
+    }
+    .bar-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 8px;
+      white-space: nowrap;
+    }
+    @media (max-width: 900px) {
+      .admin-layout {
+        grid-template-columns: 1fr;
+      }
+      .admin-sidebar {
+        padding: 16px;
+      }
+      .admin-content {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container" style="max-width: 1400px;">
+      <nav class="navbar" style="height: 68px;">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="index.html" class="brand-logo" style="font-size: 1.2rem;">
+            <div class="brand-icon" style="width: 38px; height: 38px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 21V10a8 8 0 0 1 16 0v11"/>
+                <path d="M9 21v-7a3 3 0 0 1 6 0v7"/>
+              </svg>
+            </div>
+            <span>لوحة تحكم الحِجر</span>
+          </a>
+        </div>
+
+        <div class="nav-actions">
+          <button id="btn-toggle-theme" class="btn btn-secondary btn-sm" title="تبديل المظهر">🌙 الوضع الداكن</button>
+          <a href="scanner.html" class="btn btn-gold btn-sm" title="فتح شاشة ماسح QR Code">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span>شاشة مسح QR</span>
+          </a>
+          <a href="index.html" class="btn btn-secondary btn-sm" target="_blank">الموقع العام</a>
+          <button id="btn-admin-logout" class="btn btn-outline-gold btn-sm">خروج</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- تخطيط لوحة التحكم الرئيسي -->
+  <div class="admin-layout">
+    
+    <!-- القائمة الجانبية (Sidebar) -->
+    <aside class="admin-sidebar">
+      <div class="admin-user-card">
+        <div class="admin-user-avatar" id="sidebar-avatar">م</div>
+        <div style="overflow: hidden;">
+          <div style="font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="sidebar-user-name">-</div>
+          <div style="font-size: 0.78rem; color: var(--gold-light);" id="sidebar-user-role">-</div>
+        </div>
+      </div>
+
+      <ul class="admin-menu">
+        <li class="admin-menu-item active" data-tab="dashboard">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"/>
+            <rect x="14" y="3" width="7" height="7"/>
+            <rect x="14" y="14" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/>
+          </svg>
+          <span>نظرة عامة ومؤشرات</span>
+        </li>
+        <li class="admin-menu-item" data-tab="appointments">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>إدارة المواعيد</span>
+        </li>
+        <li class="admin-menu-item" data-tab="bookings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          <span>إدارة الحجوزات</span>
+        </li>
+        <li class="admin-menu-item" data-tab="reports">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6" y1="20" x2="6" y2="14"/>
+          </svg>
+          <span>التقارير والتصدير</span>
+        </li>
+        <li class="admin-menu-item admin-only" data-tab="settings">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <span>إعدادات النظام</span>
+        </li>
+        <li class="admin-menu-item admin-only" data-tab="users">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <span>المستخدمين والمشرفين</span>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- مساحة المحتوى الرئيسية -->
+    <main class="admin-content">
+
+      <!-- ================= 1. تبويب المؤشرات الرئيسية ================= -->
+      <section id="tab-dashboard" class="admin-tab-pane">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 4px;">لوحة المؤشرات والإحصائيات</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">متابعة تفويج الحِجر، حالة الحجوزات ونسب الإشغال اللحظية</p>
+          </div>
+          <button id="btn-refresh-stats" class="btn btn-secondary btn-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            <span>تحديث البيانات</span>
+          </button>
+        </div>
+
+        <!-- بطاقات الإحصائيات -->
+        <div class="stats-cards-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #E8F2EE; color: var(--primary);">📋</div>
+            <div>
+              <div class="stat-val" id="stat-total-bookings">0</div>
+              <div class="stat-title">إجمالي الحجوزات</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #FAF6ED; color: var(--gold-dark);">📅</div>
+            <div>
+              <div class="stat-val" id="stat-today-bookings">0</div>
+              <div class="stat-title">حجوزات اليوم</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #ECFDF5; color: #059669;">✓</div>
+            <div>
+              <div class="stat-val" id="stat-confirmed-bookings">0</div>
+              <div class="stat-title">الحجوزات المؤكدة</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #FFFBEB; color: #D97706;">🚪</div>
+            <div>
+              <div class="stat-val" id="stat-used-bookings">0</div>
+              <div class="stat-title">تم الدخول (مستخدم)</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #FEF2F2; color: #DC2626;">✕</div>
+            <div>
+              <div class="stat-val" id="stat-cancelled-bookings">0</div>
+              <div class="stat-title">الحجوزات الملغاة</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon" style="background: #F0F9FF; color: #0284C7;">📊</div>
+            <div>
+              <div class="stat-val" id="stat-occupancy-rate">0%</div>
+              <div class="stat-title">نسبة الإشغال الكلية</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- الرسم البياني للأيام القادمة -->
+        <div class="chart-container">
+          <h3 style="font-size: 1.2rem; margin-bottom: 6px;">حجم الحجوزات والسعة للأيام القادمة</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">مقارنة عدد المقاعد المحجوزة بالنسبة للسعة المتاحة</p>
+          <div class="simple-bar-chart" id="dashboard-bar-chart">
+            <!-- يتم توليد الأعمدة ديناميكياً -->
+          </div>
+        </div>
+
+        <!-- سجل العمليات الحديثة -->
+        <div class="data-table-container" style="padding: 20px;">
+          <h3 style="font-size: 1.2rem; margin-bottom: 16px;">سجل العمليات والنشاطات الحديثة (Audit Logs)</h3>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>الوقت</th>
+                <th>المستخدم / المنفذ</th>
+                <th>نوع العملية</th>
+                <th>التفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="recent-logs-tbody">
+              <!-- سجلات التدقيق -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 2. تبويب إدارة المواعيد ================= -->
+      <section id="tab-appointments" class="admin-tab-pane" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 4px;">إدارة المواعيد والفترات</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">إنشاء فترات التفويج، تحديد الطاقة الاستيعابية والتحكم بالمقاعد</p>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-open-create-slot-modal" class="btn btn-primary btn-sm admin-only">
+              + إضافة موعد فردي
+            </button>
+            <button id="btn-open-bulk-modal" class="btn btn-gold btn-sm admin-only">
+              ⚡ توليد مواعيد تلقائية
+            </button>
+          </div>
+        </div>
+
+        <!-- جدول المواعيد -->
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>التاريخ</th>
+                <th>الفترة الزمنية</th>
+                <th>المسمى / الملاحظات</th>
+                <th>السعة الكلية</th>
+                <th>المحجوز</th>
+                <th>المتبقي</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="appointments-tbody">
+              <!-- مواعيد -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= 3. تبويب إدارة الحجوزات ================= -->
+      <section id="tab-bookings" class="admin-tab-pane" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+          <div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 4px;">إدارة سجلات الحجوزات</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">البحث، الفلترة، استعراض التذاكر، وتسجيل الدخول اليدوي</p>
+          </div>
+        </div>
+
+        <!-- شريط البحث والفلاتر -->
+        <div style="background: #FFFFFF; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 18px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap;">
+          <input type="text" id="booking-search-input" class="form-control" placeholder="البحث برقم الحجز، الاسم، الجوال أو الهوية..." style="flex: 2; min-width: 240px;">
+          
+          <select id="booking-status-filter" class="form-control" style="flex: 1; min-width: 140px;">
+            <option value="ALL">جميع الحالات</option>
+            <option value="CONFIRMED">مؤكد</option>
+            <option value="USED">مستخدم</option>
+            <option value="CANCELLED">ملغى</option>
+          </select>
+
+          <input type="date" id="booking-date-filter" class="form-control" style="flex: 1; min-width: 140px;">
+
+          <button id="btn-apply-filters" class="btn btn-primary" style="padding: 0 20px;">
+            تصفية
+          </button>
+          <button id="btn-reset-filters" class="btn btn-secondary" style="padding: 0 16px;">
+            إعادة تعيين
+          </button>
+        </div>
+
+        <!-- جدول الحجوزات -->
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>رقم الحجز</th>
+                <th>اسم الزائر</th>
+                <th>الجوال</th>
+                <th>الهوية</th>
+                <th>الموعد</th>
+                <th>الأفراد</th>
+                <th>الحالة</th>
+                <th>تاريخ الإنشاء</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-tbody">
+              <!-- حجوزات -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- أزرار الصفحات -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+          <span style="font-size: 0.88rem; color: var(--text-muted);" id="pagination-info">صفحة 1 من 1</span>
+          <div style="display: flex; gap: 8px;">
+            <button id="btn-prev-page" class="btn btn-secondary btn-sm" disabled>السابق</button>
+            <button id="btn-next-page" class="btn btn-secondary btn-sm" disabled>التالي</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 4. تبويب التقارير والتصدير ================= -->
+      <section id="tab-reports" class="admin-tab-pane" style="display: none;">
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-size: 1.8rem; margin-bottom: 4px;">التقارير والإحصائيات التراكمية</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">تحليل أداء التفويج وتصدير سجلات الحجوزات إلى ملفات Excel/CSV</p>
+        </div>
+
+        <div class="booking-card" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+            <div>
+              <h3 style="font-size: 1.2rem; margin-bottom: 6px;">تصدير سجلات الحجوزات الكاملة</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">ملف CSV جاهز ومتوافق باللغة العربية مع Microsoft Excel</p>
+            </div>
+            <a id="btn-export-csv" href="/api/reports/export-csv" class="btn btn-gold btn-lg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>تحميل ملف Excel / CSV</span>
+            </a>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+          <div class="booking-card">
+            <h4 style="margin-bottom: 12px; color: var(--primary);">تحديد نطاق التقرير</h4>
+            <div class="form-group">
+              <label class="form-label">الفترة الزمنية:</label>
+              <select id="report-period-select" class="form-control">
+                <option value="day">اليوم الحالي</option>
+                <option value="week" selected>آخر 7 أيام</option>
+                <option value="month">آخر 30 يومًا</option>
+              </select>
+            </div>
+            <button id="btn-load-period-report" class="btn btn-primary btn-block">توليد التقرير</button>
+          </div>
+
+          <div class="booking-card" id="period-report-results">
+            <h4 style="margin-bottom: 12px; color: var(--primary);">ملخص الفترة المحددة</h4>
+            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 0.95rem;">
+              <div style="display: flex; justify-content: space-between;"><span>إجمالي الحجوزات:</span> <strong id="rep-total">-</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span>المؤكدة:</span> <strong id="rep-confirmed" style="color: #059669;">-</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span>المستخدمة (تم الدخول):</span> <strong id="rep-used" style="color: #D97706;">-</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span>الملغاة:</span> <strong id="rep-cancelled" style="color: #DC2626;">-</strong></div>
+              <div style="display: flex; justify-content: space-between;"><span>إجمالي المستفيدين:</span> <strong id="rep-persons">-</strong></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 5. تبويب إعدادات النظام ================= -->
+      <section id="tab-settings" class="admin-tab-pane admin-only" style="display: none;">
+        <div style="margin-bottom: 24px;">
+          <h2 style="font-size: 1.8rem; margin-bottom: 4px;">إعدادات المنصة وسياسات الحجز</h2>
+          <p style="color: var(--text-muted); font-size: 0.95rem;">التحكم في معايير النظام وسياسات الإلغاء والسعة الافتراضية</p>
+        </div>
+
+        <div class="booking-card">
+          <form id="settings-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="set-platform-name" class="form-label">اسم المنصة:</label>
+                <input type="text" id="set-platform-name" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="set-max-persons" class="form-label">الحد الأقصى للأفراد بالحجز الواحد:</label>
+                <input type="number" id="set-max-persons" class="form-control" min="1" max="10" required>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="set-cancel-hours" class="form-label">ساعات السماح بالإلغاء قبل الموعد:</label>
+                <input type="number" id="set-cancel-hours" class="form-control" min="0" max="48" required>
+              </div>
+              <div class="form-group">
+                <label for="set-default-capacity" class="form-label">السعة الافتراضية للفترة:</label>
+                <input type="number" id="set-default-capacity" class="form-control" min="1" max="200" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="set-disclaimer" class="form-label">نص إخلاء المسؤولية الرسمي:</label>
+              <textarea id="set-disclaimer" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="set-instructions" class="form-label">نص التعليمات والإرشادات العامة للزوار:</label>
+              <textarea id="set-instructions" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <button type="submit" id="btn-save-settings" class="btn btn-gold btn-lg">
+              حفظ وتطبيق الإعدادات
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ================= 6. تبويب المستخدمين والمشرفين ================= -->
+      <section id="tab-users" class="admin-tab-pane admin-only" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 style="font-size: 1.8rem; margin-bottom: 4px;">إدارة المشرفين وصلاحيات الدخول</h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">إنشاء وإدارة حسابات مسؤولي البوابات وموظفي التنظيم</p>
+          </div>
+          <button id="btn-open-create-user-modal" class="btn btn-primary btn-sm">
+            + إضافة موظف جديد
+          </button>
+        </div>
+
+        <div class="data-table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>اسم المستخدم</th>
+                <th>الاسم الكامل</th>
+                <th>الدور / الصلاحية</th>
+                <th>البريد الإلكتروني</th>
+                <th>تاريخ الإنشاء</th>
+                <th>الحالة</th>
+                <th>الإجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="users-tbody">
+              <!-- مستخدمين -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- مودال إضافة موعد فردي -->
+  <div class="modal-overlay" id="modal-create-slot">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>إضافة موعد جديد</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-slot-modal">&times;</button>
+      </div>
+      <form id="create-slot-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">تاريخ الموعد:</label>
+            <input type="date" id="slot-date" class="form-control" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">وقت البداية:</label>
+              <input type="time" id="slot-start" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">وقت النهاية:</label>
+              <input type="time" id="slot-end" class="form-control" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">السعة القصوى للمقاعد:</label>
+            <input type="number" id="slot-capacity" class="form-control" value="40" min="1" max="200" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ملاحظات / اسم الفترة:</label>
+            <input type="text" id="slot-notes" class="form-control" placeholder="مثال: فترة الضحى">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-abort-slot-modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">حفظ الموعد</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- مودال توليد مواعيد تلقائية مجدولة -->
+  <div class="modal-overlay" id="modal-bulk-slots">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>⚡ توليد مواعيد وفترات تلقائية ليوم محدد</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-bulk-modal">&times;</button>
+      </div>
+      <form id="bulk-slots-form">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">تاريخ اليوم المراد جدولته:</label>
+              <input type="date" id="bulk-slot-date" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">سعة المقاعد الافتراضية لكل فترة:</label>
+              <input type="number" id="bulk-slot-capacity" class="form-control" value="40" min="1" max="200" required>
+            </div>
+          </div>
+
+          <label class="form-label" style="margin-top: 10px;">اختر الفترات اليومية المراد إدراجها:</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--bg-page); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 16px;">
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="06:00|08:00|فترة الصباح الأولى (06:00 ص - 08:00 ص)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">06:00 ص - 08:00 ص (صباح 1)</span>
+            </label>
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="08:00|10:00|فترة الصباح الثانية (08:00 ص - 10:00 ص)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">08:00 ص - 10:00 ص (صباح 2)</span>
+            </label>
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="10:00|12:00|فترة قبل الظهر (10:00 ص - 12:00 م)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">10:00 ص - 12:00 م (ضحى)</span>
+            </label>
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="13:00|15:00|فترة بعد الظهر (01:00 م - 03:00 م)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">01:00 م - 03:00 م (ظهر)</span>
+            </label>
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="16:00|18:00|فترة العصر (04:00 م - 06:00 م)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">04:00 م - 06:00 م (عصر)</span>
+            </label>
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="22:00|00:00|فترة المساء (10:00 م - 12:00 ص)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">10:00 م - 12:00 ص (مساء)</span>
+            </label>
+            <label class="form-check" style="margin-bottom: 0;">
+              <input type="checkbox" name="bulk_slot" value="00:00|02:00|فترة منتصف الليل (12:00 ص - 02:00 ص)" checked>
+              <span class="form-check-label" style="font-size: 0.88rem;">12:00 ص - 02:00 ص (منتصف الليل)</span>
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-abort-bulk-modal">إلغاء</button>
+          <button type="submit" class="btn btn-gold">توليد الفترات الآن</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- مودال إضافة موظف جديد -->
+  <div class="modal-overlay" id="modal-create-user">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>إضافة مشرف أو موظف جديد</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-user-modal">&times;</button>
+      </div>
+      <form id="create-user-form">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">اسم المستخدم (للدخول):</label>
+            <input type="text" id="new-user-username" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">الاسم الكامل:</label>
+            <input type="text" id="new-user-fullname" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">كلمة المرور:</label>
+            <input type="password" id="new-user-password" class="form-control" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label class="form-label">الصلاحية:</label>
+            <select id="new-user-role" class="form-control">
+              <option value="STAFF" selected>مشرف تفويج (مسح QR فقط)</option>
+              <option value="ADMIN">مدير نظام (تحكم كامل)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-abort-user-modal">إلغاء</button>
+          <button type="submit" class="btn btn-primary">إنشاء الحساب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
