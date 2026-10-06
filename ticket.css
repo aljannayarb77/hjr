@@ -1,0 +1,213 @@
+/* ==========================================================================
+   تنسيقات التذكرة الإلكترونية والطباعة الرسمية
+   ========================================================================== */
+
+.ticket-container {
+  max-width: 550px;
+  margin: 30px auto;
+  padding: 0 16px;
+}
+
+.ticket-pass {
+  background: #FFFFFF;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(13, 59, 46, 0.12);
+  border: 2px solid #E2E7DF;
+  overflow: hidden;
+  position: relative;
+}
+
+/* الشعار والرأس */
+.pass-header {
+  background: linear-gradient(135deg, #08261E, #0D3B2E);
+  color: #FFFFFF;
+  padding: 24px;
+  text-align: center;
+  border-bottom: 3px solid #C5A059;
+  position: relative;
+}
+
+.pass-header .logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(197, 160, 89, 0.2);
+  border: 1px solid #C5A059;
+  padding: 4px 14px;
+  border-radius: 999px;
+  color: #DFC185;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.pass-header h2 {
+  color: #FFFFFF;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.pass-ref-tag {
+  display: inline-block;
+  font-family: monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px 16px;
+  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px dashed rgba(197, 160, 89, 0.6);
+}
+
+/* جسم التذكرة */
+.pass-body {
+  padding: 24px;
+  background: #FFFFFF;
+}
+
+/* مساحة QR */
+.pass-qr-box {
+  background: #FAFBF9;
+  border: 2px dashed #CBD5E1;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.pass-qr-box img {
+  width: 220px;
+  height: 220px;
+  border-radius: 12px;
+  display: block;
+  margin: 0 auto 12px;
+  background: #FFFFFF;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.pass-qr-caption {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0D3B2E;
+}
+
+/* جدول بيانات التذكرة */
+.pass-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.pass-info-cell {
+  background: #F8F9F5;
+  border: 1px solid #E2E7DF;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.pass-info-cell .title {
+  font-size: 0.78rem;
+  color: #64748B;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.pass-info-cell .val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0D3B2E;
+}
+
+/* خرم التذكرة الجانبي الجمالي */
+.pass-divider {
+  position: relative;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pass-divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 2px dashed #CBD5E1;
+}
+
+.pass-divider .cut-right, .pass-divider .cut-left {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: #F8F9F5;
+  border-radius: 50%;
+  top: -2px;
+}
+
+.pass-divider .cut-right { right: -12px; }
+.pass-divider .cut-left { left: -12px; }
+
+/* قسم التنبيهات داخل التذكرة */
+.pass-notes {
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 24px;
+  font-size: 0.85rem;
+  color: #92400E;
+  line-height: 1.6;
+}
+
+.pass-notes strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* أزرار التحكم بالتذكرة */
+.pass-btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+/* تنسيقات الطباعة (Print Styles) */
+@media print {
+  body {
+    background: #FFFFFF !important;
+    padding: 0 !important;
+  }
+
+  .site-header,
+  .site-footer,
+  .disclaimer-banner,
+  .pass-btn-group,
+  .no-print {
+    display: none !important;
+  }
+
+  .ticket-container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .ticket-pass {
+    box-shadow: none !important;
+    border: 1px solid #000000 !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid;
+  }
+
+  .pass-header {
+    background: #0D3B2E !important;
+    color: #FFFFFF !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

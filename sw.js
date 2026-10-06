@@ -6,10 +6,10 @@ const ASSETS_TO_CACHE = [
   'book.html',
   'ticket.html',
   'inquiry.html',
-  'css/style.css',
-  'css/ticket.css',
-  'js/app.js',
-  'assets/logo.svg',
+  'style.css',
+  'ticket.css',
+  'app.js',
+  'logo.svg',
   'manifest.json'
 ];
 
