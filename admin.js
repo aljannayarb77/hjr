@@ -69,43 +69,77 @@ function setupTabNavigation() {
 async function loadDashboardStats() {
   try {
     const data = await apiRequest('/reports/dashboard');
-    if (!data.success) return;
+    if (!data || !data.success) return;
 
-    const s = data.stats;
-    document.getElementById('stat-total-bookings').textContent = s.total_bookings.toLocaleString('ar-SA');
-    document.getElementById('stat-today-bookings').textContent = s.today_bookings.toLocaleString('ar-SA');
-    document.getElementById('stat-confirmed-bookings').textContent = s.confirmed_bookings.toLocaleString('ar-SA');
-    document.getElementById('stat-used-bookings').textContent = s.used_bookings.toLocaleString('ar-SA');
-    document.getElementById('stat-cancelled-bookings').textContent = s.cancelled_bookings.toLocaleString('ar-SA');
-    document.getElementById('stat-occupancy-rate').textContent = `${s.occupancy_rate}%`;
+    const s = data.stats || data.summary || {};
+    const getNum = (v) => (typeof v === 'number' ? v : (parseInt(v, 10) || 0));
+
+    const total = getNum(s.total_bookings);
+    const today = getNum(s.today_bookings);
+    const confirmed = getNum(s.confirmed_bookings !== undefined ? s.confirmed_bookings : s.active_bookings);
+    const used = getNum(s.used_bookings !== undefined ? s.used_bookings : s.total_entries);
+    const cancelled = getNum(s.cancelled_bookings);
+    const occupancy = getNum(s.occupancy_rate);
+
+    const elTotal = document.getElementById('stat-total-bookings');
+    if (elTotal) elTotal.textContent = total.toLocaleString('ar-SA');
+
+    const elToday = document.getElementById('stat-today-bookings');
+    if (elToday) elToday.textContent = today.toLocaleString('ar-SA');
+
+    const elConfirmed = document.getElementById('stat-confirmed-bookings');
+    if (elConfirmed) elConfirmed.textContent = confirmed.toLocaleString('ar-SA');
+
+    const elUsed = document.getElementById('stat-used-bookings');
+    if (elUsed) elUsed.textContent = used.toLocaleString('ar-SA');
+
+    const elCancelled = document.getElementById('stat-cancelled-bookings');
+    if (elCancelled) elCancelled.textContent = cancelled.toLocaleString('ar-SA');
+
+    const elOcc = document.getElementById('stat-occupancy-rate');
+    if (elOcc) elOcc.textContent = `${occupancy}%`;
 
     // رسم الأعمدة البيانية
     renderBarChart(data.chart_data || []);
 
     // سجل العمليات الحديثة
-    renderRecentLogs(data.recent_activity || []);
+    renderRecentLogs(data.recent_activity || data.recent_logs || []);
   } catch (err) {
+    console.error('Error loading dashboard stats:', err);
     showToast('فشل تحديث بيانات لوحة المؤشرات.', 'error');
   }
 }
 
 function renderBarChart(chartData) {
   const container = document.getElementById('dashboard-bar-chart');
+  if (!container) return;
   container.innerHTML = '';
 
-  const maxVal = Math.max(...chartData.map(d => Math.max(d.capacity, d.bookings, 1)));
+  if (!chartData || chartData.length === 0) {
+    container.innerHTML = '<div style="text-align: center; width: 100%; color: var(--text-muted); padding: 20px;">لا توجد بيانات للأيام القادمة</div>';
+    return;
+  }
+
+  const maxVal = Math.max(1, ...chartData.map(d => Math.max(d.capacity || 1, d.bookings || 0)));
 
   chartData.forEach(item => {
     const col = document.createElement('div');
     col.className = 'bar-col';
 
-    const heightPct = Math.min(100, Math.round((item.bookings / maxVal) * 100));
-    const dObj = new Date(item.date);
-    const dayLabel = dObj.toLocaleDateString('ar-SA', { weekday: 'short', day: 'numeric' });
+    const bookings = item.bookings || 0;
+    const capacity = item.capacity || 40;
+    const heightPct = Math.min(100, Math.round((bookings / maxVal) * 100));
+    
+    let dayLabel = '-';
+    if (item.date) {
+      const parts = item.date.split('-');
+      const dObj = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10), 12, 0, 0);
+      dayLabel = dObj.toLocaleDateString('ar-SA', { weekday: 'short', day: 'numeric' });
+    }
 
     col.innerHTML = `
-      <div style="font-size: 0.72rem; font-weight: 700; color: var(--primary); margin-bottom: 4px;">${item.bookings}</div>
-      <div class="bar-rect" style="height: ${Math.max(6, heightPct)}%;" title="المحجوز: ${item.bookings} / السعة: ${item.capacity}"></div>
+      <div style="font-size: 0.72rem; font-weight: 700; color: var(--primary); margin-bottom: 4px;">${bookings}</div>
+      <div class="bar-rect" style="height: ${Math.max(8, heightPct)}%;" title="المحجوز: ${bookings} / السعة: ${capacity}"></div>
       <div class="bar-label">${dayLabel}</div>
     `;
 

@@ -734,38 +734,85 @@ async function handleClientDemoApi(endpoint, options = {}) {
   if (endpoint.startsWith('/reports/dashboard')) {
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
     const totalBookings = db.bookings.length;
-    const totalEntries = db.bookings.filter(b => b.status === 'USED').length;
-    const activeBookings = db.bookings.filter(b => b.status === 'CONFIRMED').length;
-    const totalVisitors = db.bookings.reduce((sum, b) => sum + (b.persons_count || 1), 0);
-    const todayBookings = db.bookings.filter(b => b.appointment?.date === todayStr);
-    const todayBookedSeats = todayBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'USED').reduce((sum, b) => sum + (b.persons_count || 1), 0);
+    let todayBookings = 0;
+    let confirmedCount = 0;
+    let usedCount = 0;
+    let cancelledCount = 0;
+    let totalPersonsServed = 0;
+
+    const appointmentsMap = {};
+    let totalCapacity = 0;
+    let fullSlotsCount = 0;
+
+    (db.appointments || []).forEach(a => {
+      appointmentsMap[a.id] = a;
+      totalCapacity += (a.capacity || 0);
+      const rem = (a.capacity || 0) - (a.booked_count || 0);
+      if (rem <= 0) fullSlotsCount++;
+    });
+
+    db.bookings.forEach(b => {
+      const app = b.appointment || appointmentsMap[b.appointment_id];
+      if (app && app.date === todayStr) {
+        todayBookings++;
+      }
+      if (b.status === 'CONFIRMED') confirmedCount++;
+      else if (b.status === 'USED') {
+        usedCount++;
+        totalPersonsServed += (b.persons_count || 1);
+      } else if (b.status === 'CANCELLED') {
+        cancelledCount++;
+      }
+    });
+
+    const activeBookingsCount = confirmedCount + usedCount;
+    const occupancyRate = totalCapacity > 0 
+      ? Math.round((activeBookingsCount / totalCapacity) * 100) 
+      : (totalBookings > 0 ? Math.round((activeBookingsCount / (totalBookings * 2 || 1)) * 100) : 0);
+
+    // تجميع الحجوزات للأيام السبعة القادمة للرسم البياني
+    const next7Days = {};
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      next7Days[dStr] = { date: dStr, bookings: 0, capacity: 0 };
+    }
+
+    (db.appointments || []).forEach(a => {
+      if (next7Days[a.date]) {
+        next7Days[a.date].capacity += (a.capacity || 0);
+      }
+    });
+
+    db.bookings.forEach(b => {
+      const app = b.appointment || appointmentsMap[b.appointment_id];
+      if (app && next7Days[app.date] && ['CONFIRMED', 'USED'].includes(b.status)) {
+        next7Days[app.date].bookings += (b.persons_count || 1);
+      }
+    });
+
+    const statsObj = {
+      total_bookings: totalBookings,
+      today_bookings: todayBookings,
+      confirmed_bookings: confirmedCount,
+      used_bookings: usedCount,
+      cancelled_bookings: cancelledCount,
+      full_slots_count: fullSlotsCount,
+      total_capacity: totalCapacity,
+      total_persons_served: totalPersonsServed,
+      occupancy_rate: occupancyRate
+    };
 
     return {
       success: true,
-      summary: {
-        total_bookings: totalBookings,
-        total_visitors: totalVisitors,
-        total_entries: totalEntries,
-        active_bookings: activeBookings,
-        total_appointments: db.appointments.length || 14
-      },
-      today_stats: {
-        slots_count: 7,
-        total_capacity: 280,
-        booked_seats: todayBookedSeats || 40,
-        remaining_seats: Math.max(0, 280 - (todayBookedSeats || 40))
-      },
-      chart_data: [
-        { label: '06:00 ص - 08:00 ص', booked: 40, capacity: 40 },
-        { label: '08:00 ص - 10:00 ص', booked: 32, capacity: 40 },
-        { label: '10:00 ص - 12:00 م', booked: 18, capacity: 40 },
-        { label: '01:00 م - 03:00 م', booked: 25, capacity: 40 },
-        { label: '04:00 م - 06:00 م', booked: 38, capacity: 40 },
-        { label: '10:00 م - 12:00 ص', booked: 40, capacity: 40 },
-        { label: '12:00 ص - 02:00 ص', booked: 20, capacity: 40 }
-      ],
-      recent_logs: db.audit_logs || []
+      stats: statsObj,
+      summary: statsObj,
+      chart_data: Object.values(next7Days),
+      recent_activity: (db.audit_logs || []).slice(0, 10),
+      recent_logs: (db.audit_logs || []).slice(0, 10)
     };
   }
 
