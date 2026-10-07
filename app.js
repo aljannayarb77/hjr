@@ -82,18 +82,21 @@ async function apiRequest(endpoint, options = {}) {
 }
 
 // ============================================================================
-// محاكي الـ API التفاعلي المدمج (للتشغيل المباشر على GitHub Pages)
+// محاكي الـ API التفاعلي وقاعدة البيانات المتكاملة (للتشغيل المباشر على GitHub Pages)
 // ============================================================================
-function getDemoDb() {
-  let dbStr = localStorage.getItem('alhijr_demo_db');
-  if (dbStr) {
-    try { return JSON.parse(dbStr); } catch (e) {}
-  }
 
-  const initialDb = {
+function getDefaultDatabase() {
+  const today = new Date();
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  
+  const tmrw = new Date(today);
+  tmrw.setDate(today.getDate() + 1);
+  const tmrwStr = `${tmrw.getFullYear()}-${String(tmrw.getMonth() + 1).padStart(2, '0')}-${String(tmrw.getDate()).padStart(2, '0')}`;
+
+  return {
     users: [
-      { id: 'usr_admin_01', username: 'admin', full_name: 'ماجد محسن الشهري (المدير العام)', role: 'ADMIN', is_active: true },
-      { id: 'usr_staff_01', username: 'staff', full_name: 'فهد الغامدي (مشرف الدخول والتفويج)', role: 'STAFF', is_active: true }
+      { id: 'usr_admin_01', username: 'admin', full_name: 'ماجد محسن الشهري (المدير العام)', role: 'ADMIN', is_active: true, email: 'admin@alhijr.local', created_at: '2026-10-06T17:00:00.000Z' },
+      { id: 'usr_staff_01', username: 'staff', full_name: 'فهد الغامدي (مشرف الدخول والتفويج)', role: 'STAFF', is_active: true, email: 'staff@alhijr.local', created_at: '2026-10-06T17:00:00.000Z' }
     ],
     appointments: [],
     bookings: [
@@ -107,20 +110,185 @@ function getDemoDb() {
         persons_count: 2,
         special_needs: false,
         status: 'CONFIRMED',
-        appointment_id: 'app_sample',
+        appointment_id: `app_${todayStr}_0800`,
         qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-8812',
-        qr_token: 'demo_token_8812',
-        created_at: new Date().toISOString(),
+        qr_token: 'HJ-V1-8812-moroj-ghamdi',
+        created_at: new Date(Date.now() - 3600000).toISOString(),
         appointment: {
-          date: new Date().toISOString().split('T')[0],
+          date: todayStr,
           start_time: '08:00',
           end_time: '10:00',
           notes: 'فترة الصباح الثانية (08:00 ص - 10:00 ص)'
         }
+      },
+      {
+        id: 'bk_demo_01',
+        booking_ref: 'HJ-2026-1001',
+        national_id: '1088765432',
+        phone: '0555123456',
+        full_name: 'محمد عبدالله باوزير',
+        nationality: 'سعودي',
+        persons_count: 2,
+        special_needs: false,
+        status: 'CONFIRMED',
+        appointment_id: `app_${todayStr}_2200`,
+        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1001',
+        qr_token: 'HJ-V1-39f432eca0560844-e5d85021702d69ca',
+        created_at: new Date(Date.now() - 7200000).toISOString(),
+        appointment: {
+          date: todayStr,
+          start_time: '22:00',
+          end_time: '00:00',
+          notes: 'فترة المساء (10:00 م - 12:00 ص)'
+        }
+      },
+      {
+        id: 'bk_demo_02',
+        booking_ref: 'HJ-2026-1002',
+        national_id: '1099887766',
+        phone: '0501239876',
+        full_name: 'أحمد إبراهيم الدوسري',
+        nationality: 'سعودي',
+        persons_count: 1,
+        special_needs: false,
+        status: 'USED',
+        used_at: new Date(Date.now() - 14400000).toISOString(),
+        appointment_id: `app_${todayStr}_0600`,
+        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1002',
+        qr_token: 'HJ-V1-61a79cb698e8f45d-167cfe1eb02103cc',
+        created_at: new Date(Date.now() - 28800000).toISOString(),
+        appointment: {
+          date: todayStr,
+          start_time: '06:00',
+          end_time: '08:00',
+          notes: 'فترة الصباح الأولى (06:00 ص - 08:00 ص)'
+        }
+      },
+      {
+        id: 'bk_demo_03',
+        booking_ref: 'HJ-2026-1003',
+        national_id: '1044556677',
+        phone: '0567890123',
+        full_name: 'فهد سالم العتيبي',
+        nationality: 'سعودي',
+        persons_count: 3,
+        special_needs: false,
+        status: 'CANCELLED',
+        cancelled_at: new Date(Date.now() - 18000000).toISOString(),
+        appointment_id: `app_${todayStr}_1000`,
+        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1003',
+        qr_token: 'HJ-V1-2b21d5d10115b40d-836186c870ace34b',
+        created_at: new Date(Date.now() - 36000000).toISOString(),
+        appointment: {
+          date: todayStr,
+          start_time: '10:00',
+          end_time: '12:00',
+          notes: 'فترة قبل الظهر (10:00 ص - 12:00 م)'
+        }
+      },
+      {
+        id: 'bk_demo_04',
+        booking_ref: 'HJ-2026-1004',
+        national_id: '2033445566',
+        phone: '0544332211',
+        full_name: 'عمر خالد المنصوري',
+        nationality: 'إماراتي',
+        persons_count: 1,
+        special_needs: false,
+        status: 'CONFIRMED',
+        appointment_id: `app_${tmrwStr}_1300`,
+        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1004',
+        qr_token: 'HJ-V1-bf5a482b4fe67b54-de98f789aa72025a',
+        created_at: new Date(Date.now() - 7200000).toISOString(),
+        appointment: {
+          date: tmrwStr,
+          start_time: '13:00',
+          end_time: '15:00',
+          notes: 'فترة بعد الظهر (01:00 م - 03:00 م)'
+        }
+      },
+      {
+        id: 'bk_6ef6a661',
+        booking_ref: 'HJ-2026-6041',
+        national_id: '1122334455',
+        phone: '0599112233',
+        full_name: 'سالم أحمد المحمدي',
+        nationality: 'سعودي',
+        persons_count: 2,
+        special_needs: false,
+        status: 'USED',
+        used_at: new Date(Date.now() - 7200000).toISOString(),
+        appointment_id: `app_${todayStr}_0600`,
+        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-6041',
+        qr_token: 'HJ-V1-e127489fabcce7a0-0e413886a339ef23',
+        created_at: new Date(Date.now() - 25000000).toISOString(),
+        appointment: {
+          date: todayStr,
+          start_time: '06:00',
+          end_time: '08:00',
+          notes: 'فترة الصباح الأولى (06:00 ص - 08:00 ص)'
+        }
+      },
+      {
+        id: 'bk_915d37fc',
+        booking_ref: 'HJ-2026-3213',
+        national_id: '1555555555',
+        phone: '0577777777',
+        full_name: 'طارق عبدالكريم',
+        nationality: 'سعودي',
+        persons_count: 1,
+        special_needs: false,
+        status: 'CANCELLED',
+        cancelled_at: new Date(Date.now() - 10000000).toISOString(),
+        appointment_id: `app_${todayStr}_0600`,
+        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-3213',
+        qr_token: 'HJ-V1-6ed2e4add9f12ae3-cbf5616aeac197b2',
+        created_at: new Date(Date.now() - 20000000).toISOString(),
+        appointment: {
+          date: todayStr,
+          start_time: '06:00',
+          end_time: '08:00',
+          notes: 'فترة الصباح الأولى (06:00 ص - 08:00 ص)'
+        }
       }
-    ]
+    ],
+    audit_logs: [
+      { id: 'log_01', actor: 'ماجد محسن الشهري (ADMIN)', action: 'UPDATE_SETTINGS', entity_type: 'settings', entity_id: 'global', details: 'تحديث إعدادات المنصة الرسمية', timestamp: '2026-10-06T21:16:00.000Z' },
+      { id: 'log_02', actor: 'ماجد محسن الشهري (ADMIN)', action: 'USER_LOGIN', entity_type: 'user', entity_id: 'usr_admin_01', details: 'تسجيل دخول المدير العام', timestamp: '2026-10-06T21:15:00.000Z' },
+      { id: 'log_03', actor: 'فهد الغامدي (STAFF)', action: 'CHECK_IN_SUCCESS', entity_type: 'booking', entity_id: 'bk_demo_02', details: 'تسجيل دخول الزائر أحمد إبراهيم الدوسري عبر ماسح QR', timestamp: '2026-10-06T15:00:00.000Z' },
+      { id: 'log_04', actor: 'فهد الغامدي (STAFF)', action: 'CHECK_IN_SUCCESS', entity_type: 'booking', entity_id: 'bk_6ef6a661', details: 'تسجيل دخول الزائر سالم أحمد المحمدي ومرافقيه (2)', timestamp: '2026-10-06T17:00:00.000Z' },
+      { id: 'log_05', actor: 'الزائر', action: 'CREATE_BOOKING', entity_type: 'booking', entity_id: 'bk_sample_01', details: 'إنشاء حجز جديد HJ-2026-8812 باسم مروج يعقوب الغامدي', timestamp: '2026-10-06T16:00:00.000Z' },
+      { id: 'log_06', actor: 'الزائر', action: 'CANCEL_BOOKING', entity_type: 'booking', entity_id: 'bk_demo_03', details: 'إلغاء الحجز HJ-2026-1003 للزائر فهد سالم العتيبي', timestamp: '2026-10-06T13:00:00.000Z' },
+      { id: 'log_07', actor: 'النظام', action: 'SYSTEM_INITIALIZATION', entity_type: 'system', entity_id: 'init', details: 'تهيئة قاعدة بيانات منصة الحِجر بنجاح', timestamp: '2026-10-06T12:00:00.000Z' }
+    ],
+    settings: {
+      platform_name: 'منصة تنظيم مواعيد دخول الحِجر',
+      platform_subtitle: 'نظام حجز إلكتروني مستقل لتنظيم مواعيد الزيارة بسلاسة وأمان',
+      disclaimer: 'تنبيه تنظيمي: هذه منصة حجز مستقلة لتنظيم المواعيد والتفويج وليست جهة حكومية رسمية، ولا تُعد بديلاً عن التصاريح الرسمية المعتمدة من الجهات المختصة.',
+      contact_phone: '920000000',
+      contact_email: 'support@alhijr-booking.local',
+      max_persons_per_booking: 7,
+      allow_cancellation: true,
+      cancellation_hours_before: 2,
+      default_slot_capacity: 40,
+      instructions_text: 'يرجى الحضور قبل الموعد بـ 15 دقيقة، وإبراز التذكرة الإلكترونية والرمز QR لموظف التنظيم عند البوابة، والالتزام بالزي المناسب والهدوء داخل الحرم الشريف.'
+    }
   };
+}
 
+function getDemoDb() {
+  let dbStr = localStorage.getItem('alhijr_demo_db');
+  if (dbStr) {
+    try {
+      const parsed = JSON.parse(dbStr);
+      if (parsed && Array.isArray(parsed.bookings) && parsed.bookings.length >= 6) {
+        return parsed;
+      }
+    } catch (e) {}
+  }
+
+  const initialDb = getDefaultDatabase();
+  ensureDemoAppointments(initialDb);
   localStorage.setItem('alhijr_demo_db', JSON.stringify(initialDb));
   return initialDb;
 }
@@ -226,7 +394,7 @@ async function handleClientDemoApi(endpoint, options = {}) {
   }
 
   // 1b. GET /appointments (جلب فترات يوم محدد أو جميع المواعيد)
-  if (endpoint.startsWith('/appointments') && method === 'GET') {
+  if (endpoint.startsWith('/appointments') && !endpoint.includes('bulk-generate') && method === 'GET') {
     const url = new URL('http://dummy' + endpoint);
     const dateStr = url.searchParams.get('date');
     const isAll = url.searchParams.get('all') === 'true';
@@ -262,7 +430,102 @@ async function handleClientDemoApi(endpoint, options = {}) {
     return { success: true, count: appointments.length, appointments };
   }
 
-  // 2. POST /bookings
+  // 1c. PUT /appointments/:id (تعديل موعد أو تبديل حالته)
+  if (endpoint.startsWith('/appointments/') && method === 'PUT') {
+    const id = endpoint.replace('/appointments/', '').split('?')[0];
+    const app = db.appointments.find(a => a.id === id);
+    if (app) {
+      if (body.capacity !== undefined) app.capacity = parseInt(body.capacity, 10);
+      if (body.is_active !== undefined) app.is_active = !!body.is_active;
+      else app.is_active = !app.is_active;
+      saveDemoDb(db);
+    }
+    return { success: true, message: 'تم تحديث الموعد بنجاح.' };
+  }
+
+  // 1d. DELETE /appointments/:id (حذف موعد)
+  if (endpoint.startsWith('/appointments/') && method === 'DELETE') {
+    const id = endpoint.replace('/appointments/', '').split('?')[0];
+    db.appointments = db.appointments.filter(a => a.id !== id);
+    saveDemoDb(db);
+    return { success: true, message: 'تم حذف الموعد بنجاح.' };
+  }
+
+  // 1e. POST /appointments (إضافة موعد جديد)
+  if (endpoint === '/appointments' && method === 'POST') {
+    const newApp = {
+      id: `app_${body.date}_${(body.start_time || '00:00').replace(':', '')}`,
+      date: body.date,
+      start_time: body.start_time,
+      end_time: body.end_time,
+      capacity: parseInt(body.capacity, 10) || 40,
+      booked_count: 0,
+      is_active: body.is_active !== undefined ? !!body.is_active : true,
+      notes: body.notes || 'فترة دخول الحِجر'
+    };
+    db.appointments.push(newApp);
+    saveDemoDb(db);
+    return { success: true, message: 'تمت إضافة الموعد بنجاح.', appointment: newApp };
+  }
+
+  // 1f. POST /appointments/bulk-generate (توليد مواعيد مجمعة)
+  if (endpoint.includes('/bulk-generate') && method === 'POST') {
+    return { success: true, message: 'تم توليد المواعيد بنجاح.' };
+  }
+
+  // 2a. POST /bookings/lookup (الاستعلام عن الحجز عبر inquiry.js)
+  if (endpoint.startsWith('/bookings/lookup') && method === 'POST') {
+    const ref = (body.booking_ref || '').trim().toUpperCase();
+    const phone = (body.phone || '').trim();
+    const b = db.bookings.find(x => x.booking_ref.toUpperCase() === ref && x.phone === phone);
+    if (!b) throw new Error('لم يتم العثور على أي حجز مطابق لبيانات الاستعلام المدخلة.');
+    return { success: true, booking: b };
+  }
+
+  // 2b. GET /bookings (قائمة الحجوزات للوحة التحكم مع الفلترة والبحث والترقيم)
+  if ((endpoint.startsWith('/bookings?') || endpoint === '/bookings') && method === 'GET') {
+    const url = new URL('http://dummy' + endpoint);
+    const search = (url.searchParams.get('search') || '').trim().toLowerCase();
+    const status = url.searchParams.get('status');
+    const date = url.searchParams.get('date');
+    const page = parseInt(url.searchParams.get('page'), 10) || 1;
+    const limit = parseInt(url.searchParams.get('limit'), 10) || 15;
+
+    let filtered = [...db.bookings];
+
+    if (search) {
+      filtered = filtered.filter(b => 
+        (b.booking_ref && b.booking_ref.toLowerCase().includes(search)) ||
+        (b.full_name && b.full_name.toLowerCase().includes(search)) ||
+        (b.national_id && b.national_id.includes(search)) ||
+        (b.phone && b.phone.includes(search))
+      );
+    }
+
+    if (status && status !== 'ALL') {
+      filtered = filtered.filter(b => b.status === status);
+    }
+
+    if (date) {
+      filtered = filtered.filter(b => b.appointment && b.appointment.date === date);
+    }
+
+    const total = filtered.length;
+    const total_pages = Math.ceil(total / limit) || 1;
+    const start = (page - 1) * limit;
+    const paged = filtered.slice(start, start + limit);
+
+    return {
+      success: true,
+      total,
+      page,
+      limit,
+      total_pages,
+      bookings: paged
+    };
+  }
+
+  // 2c. POST /bookings (إنشاء حجز جديد)
   if (endpoint === '/bookings' && method === 'POST') {
     const { appointment_id, full_name, phone, national_id, nationality, persons_count, special_needs } = body;
     const count = parseInt(persons_count, 10) || 1;
@@ -302,47 +565,82 @@ async function handleClientDemoApi(endpoint, options = {}) {
     };
 
     db.bookings.unshift(newBooking);
+    db.audit_logs.unshift({
+      id: 'log_' + Date.now(),
+      actor: 'الزائر',
+      action: 'CREATE_BOOKING',
+      entity_type: 'booking',
+      entity_id: newBooking.id,
+      details: `إنشاء حجز جديد ${newBooking.booking_ref} باسم ${newBooking.full_name} (${newBooking.persons_count} أفراد)`,
+      timestamp: new Date().toISOString()
+    });
     saveDemoDb(db);
     return { success: true, message: 'تم تأكيد الحجز بنجاح!', booking: newBooking };
   }
 
-  // 3. GET /bookings/:ref
-  if (endpoint.startsWith('/bookings/') && !endpoint.includes('inquire') && !endpoint.includes('cancel') && method === 'GET') {
+  // 2d. GET /bookings/:ref (عرض تفاصيل التذكرة الفردية)
+  if (endpoint.startsWith('/bookings/') && !endpoint.includes('inquire') && !endpoint.includes('cancel') && !endpoint.includes('lookup') && !endpoint.includes('manual-checkin') && !endpoint.includes('resend-ticket') && method === 'GET') {
     const ref = endpoint.replace('/bookings/', '').split('?')[0];
-    const b = db.bookings.find(x => x.booking_ref.toUpperCase() === ref.toUpperCase());
+    const b = db.bookings.find(x => x.booking_ref.toUpperCase() === ref.toUpperCase() || x.id === ref);
     if (!b) throw new Error('لم يتم العثور على التذكرة أو الحجز.');
     return { success: true, booking: b };
   }
 
-  // 4. GET /bookings/inquire
-  if (endpoint.startsWith('/bookings/inquire') && method === 'GET') {
-    const url = new URL('http://dummy' + endpoint);
-    const phone = url.searchParams.get('phone');
-    const ref = (url.searchParams.get('ref') || '').toUpperCase();
-    const b = db.bookings.find(x => x.phone === phone && x.booking_ref.toUpperCase() === ref);
-    if (!b) throw new Error('لم يتم العثور على أي حجز مطابق لبيانات الاستعلام المدخلة.');
-    return { success: true, booking: b };
+  // 2e. POST /bookings/:id/manual-checkin (تسجيل دخول يدوي)
+  if (endpoint.includes('/manual-checkin') && method === 'POST') {
+    const parts = endpoint.split('/');
+    const id = parts[2];
+    const b = db.bookings.find(x => x.id === id || x.booking_ref.toUpperCase() === (id || '').toUpperCase());
+    if (!b) throw new Error('الحجز غير موجود.');
+    b.status = 'USED';
+    b.used_at = new Date().toISOString();
+    db.audit_logs.unshift({
+      id: 'log_' + Date.now(),
+      actor: 'إدارة النظام (ADMIN)',
+      action: 'MANUAL_CHECKIN',
+      entity_type: 'booking',
+      entity_id: b.id,
+      details: `تسجيل دخول يدوي للزائر ${b.full_name} (${b.booking_ref})`,
+      timestamp: new Date().toISOString()
+    });
+    saveDemoDb(db);
+    return { success: true, message: 'تم تسجيل دخول الزائر بنجاح ✓', booking: b };
   }
 
-  // 5. POST /bookings/:ref/cancel
+  // 2f. POST /bookings/:id/cancel (إلغاء حجز)
   if (endpoint.includes('/cancel') && method === 'POST') {
     const parts = endpoint.split('/');
-    const ref = parts[2];
-    const b = db.bookings.find(x => x.booking_ref.toUpperCase() === (ref || '').toUpperCase());
+    const id = parts[2];
+    const b = db.bookings.find(x => x.id === id || x.booking_ref.toUpperCase() === (id || '').toUpperCase());
     if (!b) throw new Error('الحجز غير موجود.');
     b.status = 'CANCELLED';
+    b.cancelled_at = new Date().toISOString();
+    db.audit_logs.unshift({
+      id: 'log_' + Date.now(),
+      actor: 'إدارة النظام / الزائر',
+      action: 'CANCEL_BOOKING',
+      entity_type: 'booking',
+      entity_id: b.id,
+      details: `إلغاء الحجز ${b.booking_ref} باسم ${b.full_name}`,
+      timestamp: new Date().toISOString()
+    });
     saveDemoDb(db);
     return { success: true, message: 'تم إلغاء الحجز بنجاح واستعادة المقاعد للنظام.' };
   }
 
-  // 6. POST /auth/login
+  // 2g. POST /bookings/:id/resend-ticket
+  if (endpoint.includes('/resend-ticket') && method === 'POST') {
+    return { success: true, message: 'تمت إعادة إرسال إشعار التذكرة بنجاح إلى رقم الجوال.' };
+  }
+
+  // 3. POST /auth/login (تسجيل دخول المشرفين)
   if (endpoint === '/auth/login' && method === 'POST') {
     const { username, password } = body;
-    if (username === 'admin' && password === 'admin123') {
+    if (username === 'admin' && (password === 'admin123' || password === 'admin')) {
       const u = { id: 'usr_admin_01', username: 'admin', full_name: 'ماجد محسن الشهري (المدير العام)', role: 'ADMIN' };
       return { success: true, token: 'demo-admin-token', user: u };
     }
-    if (username === 'staff' && password === 'staff123') {
+    if (username === 'staff' && (password === 'staff123' || password === 'staff')) {
       const u = { id: 'usr_staff_01', username: 'staff', full_name: 'فهد الغامدي (مشرف الدخول والتفويج)', role: 'STAFF' };
       return { success: true, token: 'demo-staff-token', user: u };
     }
@@ -353,18 +651,19 @@ async function handleClientDemoApi(endpoint, options = {}) {
     throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
   }
 
-  // 7. GET /auth/users
+  // 4a. GET /auth/users (قائمة المشرفين)
   if (endpoint.startsWith('/auth/users') && method === 'GET') {
     return { success: true, users: db.users };
   }
 
-  // 8. POST /auth/users
+  // 4b. POST /auth/users (إضافة مشرف)
   if (endpoint === '/auth/users' && method === 'POST') {
     const newUser = {
       id: 'usr_' + Date.now(),
       username: body.username,
       full_name: body.full_name,
       role: body.role || 'STAFF',
+      email: body.email || `${body.username}@alhijr.local`,
       is_active: true,
       created_at: new Date().toISOString()
     };
@@ -373,7 +672,7 @@ async function handleClientDemoApi(endpoint, options = {}) {
     return { success: true, message: 'تمت إضافة المشرف بنجاح.', user: newUser };
   }
 
-  // 9. DELETE /auth/users/:id
+  // 4c. DELETE /auth/users/:id (حذف مشرف)
   if (endpoint.startsWith('/auth/users/') && method === 'DELETE') {
     const uid = endpoint.replace('/auth/users/', '');
     db.users = db.users.filter(u => u.id !== uid);
@@ -381,50 +680,81 @@ async function handleClientDemoApi(endpoint, options = {}) {
     return { success: true, message: 'تم حذف المستخدم بنجاح.' };
   }
 
-  // 10. POST /qr/verify
+  // 5a. POST /qr/verify (التحقق من رمز QR)
   if (endpoint === '/qr/verify' && method === 'POST') {
-    const token = body.token || '';
-    const b = db.bookings.find(x => x.qr_token === token || x.booking_ref.toUpperCase() === token.toUpperCase());
-    if (!b) throw new Error('رمز QR غير صالح أو غير مسجل في النظام.');
+    const raw = (body.qr_data || body.token || '').trim();
+    const b = db.bookings.find(x => 
+      x.qr_token === raw || 
+      x.booking_ref.toUpperCase() === raw.toUpperCase() ||
+      raw.includes(x.booking_ref) ||
+      (x.qr_token && raw.includes(x.qr_token))
+    );
+    if (!b) throw new Error('رمز QR غير صالح أو غير مسجل في السجلات.');
+    
+    let code = 'VALID';
+    let message = 'التصريح صالح ومؤكد لدخول الحِجر ✓';
     if (b.status === 'USED') {
-      return { success: true, valid: false, code: 'ALREADY_USED', message: 'تم استخدام هذه التذكرة مسبقاً!', booking: b };
+      code = 'ALREADY_USED';
+      message = 'تم استخدام هذه التذكرة مسبقاً والدخول بها!';
+    } else if (b.status === 'CANCELLED') {
+      code = 'CANCELLED';
+      message = 'هذا الحجز ملغى مسبقاً من قبل الإدارة أو الزائر.';
     }
-    if (b.status === 'CANCELLED') {
-      return { success: true, valid: false, code: 'CANCELLED', message: 'هذا الحجز ملغى مسبقاً.', booking: b };
-    }
-    return { success: true, valid: true, code: 'VALID', message: 'التصريح صالح ومؤكد لدخول الحِجر ✓', booking: b };
+
+    const resObj = {
+      valid: b.status === 'CONFIRMED',
+      code,
+      message,
+      booking: b
+    };
+    return { success: true, valid: b.status === 'CONFIRMED', result: resObj, booking: b };
   }
 
-  // 11. POST /qr/checkin
-  if (endpoint === '/qr/checkin' && method === 'POST') {
-    const token = body.token || '';
-    const b = db.bookings.find(x => x.qr_token === token || x.booking_ref.toUpperCase() === token.toUpperCase());
+  // 5b. POST /qr/check-in & /qr/checkin (تسجيل الدخول عند البوابة)
+  if ((endpoint === '/qr/check-in' || endpoint === '/qr/checkin') && method === 'POST') {
+    const id = body.booking_id || body.token || '';
+    const b = db.bookings.find(x => x.id === id || x.qr_token === id || x.booking_ref.toUpperCase() === id.toUpperCase());
     if (!b) throw new Error('الحجز غير موجود.');
     b.status = 'USED';
     b.used_at = new Date().toISOString();
+    db.audit_logs.unshift({
+      id: 'log_' + Date.now(),
+      actor: 'فهد الغامدي (مشرف البوابة)',
+      action: 'CHECK_IN_SUCCESS',
+      entity_type: 'booking',
+      entity_id: b.id,
+      details: `تسجيل دخول وتفويج الزائر ${b.full_name} (${b.persons_count} أفراد)`,
+      timestamp: new Date().toISOString()
+    });
     saveDemoDb(db);
     return { success: true, message: 'تم تسجيل الدخول بنجاح.', booking: b };
   }
 
-  // 12. GET /reports/dashboard
+  // 6. GET /reports/dashboard (إحصائيات لوحة التحكم)
   if (endpoint.startsWith('/reports/dashboard')) {
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
     const totalBookings = db.bookings.length;
     const totalEntries = db.bookings.filter(b => b.status === 'USED').length;
     const activeBookings = db.bookings.filter(b => b.status === 'CONFIRMED').length;
+    const totalVisitors = db.bookings.reduce((sum, b) => sum + (b.persons_count || 1), 0);
+    const todayBookings = db.bookings.filter(b => b.appointment?.date === todayStr);
+    const todayBookedSeats = todayBookings.filter(b => b.status === 'CONFIRMED' || b.status === 'USED').reduce((sum, b) => sum + (b.persons_count || 1), 0);
+
     return {
       success: true,
       summary: {
         total_bookings: totalBookings,
-        total_visitors: db.bookings.reduce((sum, b) => sum + (b.persons_count || 1), 0),
+        total_visitors: totalVisitors,
         total_entries: totalEntries,
         active_bookings: activeBookings,
-        total_appointments: db.appointments.length || 7
+        total_appointments: db.appointments.length || 14
       },
       today_stats: {
         slots_count: 7,
         total_capacity: 280,
-        booked_seats: 40,
-        remaining_seats: 240
+        booked_seats: todayBookedSeats || 40,
+        remaining_seats: Math.max(0, 280 - (todayBookedSeats || 40))
       },
       chart_data: [
         { label: '06:00 ص - 08:00 ص', booked: 40, capacity: 40 },
@@ -434,8 +764,63 @@ async function handleClientDemoApi(endpoint, options = {}) {
         { label: '04:00 م - 06:00 م', booked: 38, capacity: 40 },
         { label: '10:00 م - 12:00 ص', booked: 40, capacity: 40 },
         { label: '12:00 ص - 02:00 ص', booked: 20, capacity: 40 }
-      ]
+      ],
+      recent_logs: db.audit_logs || []
     };
+  }
+
+  // 7. GET /reports/period (تقارير الفترات)
+  if (endpoint.startsWith('/reports/period')) {
+    const total = db.bookings.length;
+    const confirmed = db.bookings.filter(b => b.status === 'CONFIRMED').length;
+    const used = db.bookings.filter(b => b.status === 'USED').length;
+    const cancelled = db.bookings.filter(b => b.status === 'CANCELLED').length;
+    const total_persons = db.bookings.reduce((sum, b) => sum + (b.persons_count || 1), 0);
+
+    return {
+      success: true,
+      metrics: { total, confirmed, used, cancelled, total_persons }
+    };
+  }
+
+  // 8. GET /settings & PUT /settings (إعدادات المنصة)
+  if (endpoint === '/settings' && method === 'GET') {
+    return { success: true, settings: db.settings };
+  }
+
+  if (endpoint === '/settings' && (method === 'PUT' || method === 'POST')) {
+    db.settings = { ...db.settings, ...body };
+    db.audit_logs.unshift({
+      id: 'log_' + Date.now(),
+      actor: 'ماجد محسن الشهري (ADMIN)',
+      action: 'UPDATE_SETTINGS',
+      entity_type: 'settings',
+      entity_id: 'global',
+      details: 'تحديث إعدادات المنصة الرسمية',
+      timestamp: new Date().toISOString()
+    });
+    saveDemoDb(db);
+    return { success: true, message: 'تم حفظ وتطبيق الإعدادات بنجاح.', settings: db.settings };
+  }
+
+  // 9. إدارة قاعدة البيانات (Reset / Export / Import)
+  if (endpoint === '/database/reset' && method === 'POST') {
+    const freshDb = getDefaultDatabase();
+    ensureDemoAppointments(freshDb);
+    saveDemoDb(freshDb);
+    return { success: true, message: 'تمت استعادة قاعدة البيانات الأصلية بنجاح!', db: freshDb };
+  }
+
+  if (endpoint === '/database/export') {
+    return { success: true, data: db };
+  }
+
+  if (endpoint === '/database/import' && method === 'POST') {
+    if (!body.data || !Array.isArray(body.data.bookings) || !Array.isArray(body.data.users)) {
+      throw new Error('ملف قاعدة البيانات غير صالح.');
+    }
+    saveDemoDb(body.data);
+    return { success: true, message: 'تم استيراد قاعدة البيانات بنجاح!' };
   }
 
   return { success: true };

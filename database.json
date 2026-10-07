@@ -1,0 +1,908 @@
+{
+  "users": [
+    {
+      "id": "usr_admin_01",
+      "username": "admin",
+      "password_hash": "$2b$10$CFx.NyJuyu.JdVNIqkbr5uFZ69LWvPNYZgqNXASNuFXj0IPHryxxW",
+      "full_name": "ماجد محسن الشهري (المدير العام)",
+      "email": "admin@alhijr.local",
+      "role": "ADMIN",
+      "is_active": true,
+      "created_at": "2026-10-06T17:00:06.758Z"
+    },
+    {
+      "id": "usr_staff_01",
+      "username": "staff",
+      "password_hash": "$2b$10$p4QQXsUVg5P195f2L8ikeOEOnnsCtP/FCCvGk1DFojTRt95Zz.I2e",
+      "full_name": "فهد الغامدي (مشرف الدخول والتفويج)",
+      "email": "staff@alhijr.local",
+      "role": "STAFF",
+      "is_active": true,
+      "created_at": "2026-10-06T17:00:06.759Z"
+    }
+  ],
+  "appointments": [
+    {
+      "id": "app_2026-10-06_0600",
+      "date": "2026-10-06",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 40,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-06_0800",
+      "date": "2026-10-06",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 32,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-06_1000",
+      "date": "2026-10-06",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-06_1300",
+      "date": "2026-10-06",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-06_1600",
+      "date": "2026-10-06",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-06_2200",
+      "date": "2026-10-06",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 2,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-06_0000",
+      "date": "2026-10-06",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_0600",
+      "date": "2026-10-07",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_0800",
+      "date": "2026-10-07",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_1000",
+      "date": "2026-10-07",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 15,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_1300",
+      "date": "2026-10-07",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_1600",
+      "date": "2026-10-07",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_2200",
+      "date": "2026-10-07",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-07_0000",
+      "date": "2026-10-07",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_0600",
+      "date": "2026-10-08",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_0800",
+      "date": "2026-10-08",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_1000",
+      "date": "2026-10-08",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_1300",
+      "date": "2026-10-08",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_1600",
+      "date": "2026-10-08",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_2200",
+      "date": "2026-10-08",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-08_0000",
+      "date": "2026-10-08",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_0600",
+      "date": "2026-10-09",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_0800",
+      "date": "2026-10-09",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_1000",
+      "date": "2026-10-09",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_1300",
+      "date": "2026-10-09",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_1600",
+      "date": "2026-10-09",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_2200",
+      "date": "2026-10-09",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-09_0000",
+      "date": "2026-10-09",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_0600",
+      "date": "2026-10-10",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_0800",
+      "date": "2026-10-10",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_1000",
+      "date": "2026-10-10",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_1300",
+      "date": "2026-10-10",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_1600",
+      "date": "2026-10-10",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_2200",
+      "date": "2026-10-10",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-10_0000",
+      "date": "2026-10-10",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_0600",
+      "date": "2026-10-11",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_0800",
+      "date": "2026-10-11",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_1000",
+      "date": "2026-10-11",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_1300",
+      "date": "2026-10-11",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_1600",
+      "date": "2026-10-11",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_2200",
+      "date": "2026-10-11",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-11_0000",
+      "date": "2026-10-11",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_0600",
+      "date": "2026-10-12",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_0800",
+      "date": "2026-10-12",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_1000",
+      "date": "2026-10-12",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_1300",
+      "date": "2026-10-12",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_1600",
+      "date": "2026-10-12",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_2200",
+      "date": "2026-10-12",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-12_0000",
+      "date": "2026-10-12",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_0600",
+      "date": "2026-10-13",
+      "start_time": "06:00",
+      "end_time": "08:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الأولى (06:00 ص - 08:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_0800",
+      "date": "2026-10-13",
+      "start_time": "08:00",
+      "end_time": "10:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة الصباح الثانية (08:00 ص - 10:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_1000",
+      "date": "2026-10-13",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة قبل الظهر (10:00 ص - 12:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_1300",
+      "date": "2026-10-13",
+      "start_time": "13:00",
+      "end_time": "15:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة بعد الظهر (01:00 م - 03:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_1600",
+      "date": "2026-10-13",
+      "start_time": "16:00",
+      "end_time": "18:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة العصر (04:00 م - 06:00 م)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_2200",
+      "date": "2026-10-13",
+      "start_time": "22:00",
+      "end_time": "00:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة المساء (10:00 م - 12:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_2026-10-13_0000",
+      "date": "2026-10-13",
+      "start_time": "00:00",
+      "end_time": "02:00",
+      "capacity": 40,
+      "booked_count": 0,
+      "is_active": true,
+      "notes": "فترة منتصف الليل (12:00 ص - 02:00 ص)",
+      "created_at": "2026-10-06T17:00:06.759Z"
+    },
+    {
+      "id": "app_test_full_slot",
+      "date": "2026-10-25",
+      "start_time": "12:00",
+      "end_time": "12:30",
+      "capacity": 1,
+      "booked_count": 1,
+      "is_active": true,
+      "notes": "موعد اختبار الامتلاء"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "bk_915d37fc-bad7-47ad-8ace-3a3d81c60ecc",
+      "booking_ref": "HJ-2026-3213",
+      "appointment_id": "app_2026-10-07_0600",
+      "full_name": "طارق عبدالكريم",
+      "phone": "0577777777",
+      "email": null,
+      "national_id": "1555555555",
+      "nationality": "سعودي",
+      "persons_count": 1,
+      "status": "CANCELLED",
+      "qr_token": "HJ-V1-6ed2e4add9f12ae3-cbf5616aeac197b2",
+      "created_at": "2026-10-06T17:00:06.980Z",
+      "used_at": null,
+      "cancelled_at": "2026-10-06T17:00:07.022Z"
+    },
+    {
+      "id": "bk_6ef6a661-7f96-4b22-8a28-ab87dff86bf4",
+      "booking_ref": "HJ-2026-6041",
+      "appointment_id": "app_2026-10-06_2200",
+      "full_name": "سالم أحمد المحمدي",
+      "phone": "0599112233",
+      "email": "salem@test.local",
+      "national_id": "1122334455",
+      "nationality": "سعودي",
+      "persons_count": 2,
+      "status": "USED",
+      "qr_token": "HJ-V1-e127489fabcce7a0-0e413886a339ef23",
+      "created_at": "2026-10-06T17:00:06.773Z",
+      "used_at": "2026-10-06T17:00:06.971Z",
+      "cancelled_at": null
+    },
+    {
+      "id": "bk_demo_01",
+      "booking_ref": "HJ-2026-1001",
+      "appointment_id": "app_2026-10-06_2200",
+      "full_name": "محمد عبدالله باوزير",
+      "phone": "0555123456",
+      "email": "m.bawazeer@example.com",
+      "national_id": "1088765432",
+      "nationality": "سعودي",
+      "persons_count": 2,
+      "status": "CONFIRMED",
+      "created_at": "2026-10-06T17:00:06.759Z",
+      "used_at": null,
+      "cancelled_at": null,
+      "qr_token": "HJ-V1-39f432eca0560844-e5d85021702d69ca"
+    },
+    {
+      "id": "bk_demo_02",
+      "booking_ref": "HJ-2026-1002",
+      "appointment_id": "app_2026-10-06_0800",
+      "full_name": "أحمد إبراهيم الدوسري",
+      "phone": "0501239876",
+      "email": "a.dosari@example.com",
+      "national_id": "1099887766",
+      "nationality": "سعودي",
+      "persons_count": 1,
+      "status": "USED",
+      "created_at": "2026-10-06T12:00:06.759Z",
+      "used_at": "2026-10-06T15:00:06.759Z",
+      "cancelled_at": null,
+      "qr_token": "HJ-V1-61a79cb698e8f45d-167cfe1eb02103cc"
+    },
+    {
+      "id": "bk_demo_03",
+      "booking_ref": "HJ-2026-1003",
+      "appointment_id": "app_2026-10-06_0800",
+      "full_name": "فهد سالم العتيبي",
+      "phone": "0567890123",
+      "email": "f.otaibi@example.com",
+      "national_id": "1044556677",
+      "nationality": "سعودي",
+      "persons_count": 3,
+      "status": "CANCELLED",
+      "created_at": "2026-10-06T09:00:06.759Z",
+      "used_at": null,
+      "cancelled_at": "2026-10-06T13:00:06.759Z",
+      "qr_token": "HJ-V1-2b21d5d10115b40d-836186c870ace34b"
+    },
+    {
+      "id": "bk_demo_04",
+      "booking_ref": "HJ-2026-1004",
+      "appointment_id": "app_2026-10-06_2200",
+      "full_name": "عمر خالد المنصوري",
+      "phone": "0544332211",
+      "email": "omar.mansoor@example.com",
+      "national_id": "2033445566",
+      "nationality": "إماراتي",
+      "persons_count": 1,
+      "status": "CONFIRMED",
+      "created_at": "2026-10-06T17:00:06.759Z",
+      "used_at": null,
+      "cancelled_at": null,
+      "qr_token": "HJ-V1-bf5a482b4fe67b54-de98f789aa72025a"
+    }
+  ],
+  "qr_tokens": [
+    {
+      "token": "HJ-V1-39f432eca0560844-e5d85021702d69ca",
+      "booking_id": "bk_demo_01",
+      "created_at": "2026-10-06T17:00:06.759Z",
+      "is_used": false,
+      "used_at": null
+    },
+    {
+      "token": "HJ-V1-61a79cb698e8f45d-167cfe1eb02103cc",
+      "booking_id": "bk_demo_02",
+      "created_at": "2026-10-06T12:00:06.759Z",
+      "is_used": true,
+      "used_at": "2026-10-06T15:00:06.759Z"
+    },
+    {
+      "token": "HJ-V1-2b21d5d10115b40d-836186c870ace34b",
+      "booking_id": "bk_demo_03",
+      "created_at": "2026-10-06T09:00:06.759Z",
+      "is_used": false,
+      "used_at": null
+    },
+    {
+      "token": "HJ-V1-bf5a482b4fe67b54-de98f789aa72025a",
+      "booking_id": "bk_demo_04",
+      "created_at": "2026-10-06T17:00:06.759Z",
+      "is_used": false,
+      "used_at": null
+    },
+    {
+      "token": "HJ-V1-e127489fabcce7a0-0e413886a339ef23",
+      "booking_id": "bk_6ef6a661-7f96-4b22-8a28-ab87dff86bf4",
+      "created_at": "2026-10-06T17:00:06.773Z",
+      "is_used": true,
+      "used_at": "2026-10-06T17:00:06.971Z"
+    },
+    {
+      "token": "HJ-V1-6ed2e4add9f12ae3-cbf5616aeac197b2",
+      "booking_id": "bk_915d37fc-bad7-47ad-8ace-3a3d81c60ecc",
+      "created_at": "2026-10-06T17:00:06.980Z",
+      "is_used": true,
+      "used_at": null
+    }
+  ],
+  "audit_logs": [
+    {
+      "id": "log_9d9e02fa-a40c-4511-bcc1-c9c69556575b",
+      "actor": "admin (ADMIN)",
+      "action": "UPDATE_SETTINGS",
+      "entity_type": "settings",
+      "entity_id": "global",
+      "details": {
+        "platform_name": "منصة تنظيم مواعيد دخول الحِجر",
+        "max_persons_per_booking": 7,
+        "cancellation_hours_before": 2,
+        "default_slot_capacity": 200,
+        "disclaimer": "تنبيه تنظيمي: هذه منصة حجز مستقلة لتنظيم المواعيد والتفويج وليست جهة حكومية رسمية، ولا تُعد بديلاً عن التصاريح الرسمية المعتمدة من الجهات المختصة.",
+        "instructions_text": "يرجى الحضور قبل الموعد بـ 15 دقيقة، وإبراز التذكرة الإلكترونية والرمز QR لموظف التنظيم عند البوابة، والالتزام بالزي المناسب والهدوء داخل الحرم الشريف."
+      },
+      "ip_address": "::1",
+      "timestamp": "2026-10-06T21:16:01.737Z"
+    },
+    {
+      "id": "log_fe623ad8-98ea-4a69-93cd-6fdaf9e0b8a6",
+      "actor": "admin (ADMIN)",
+      "action": "USER_LOGIN",
+      "entity_type": "user",
+      "entity_id": "usr_admin_01",
+      "details": {
+        "username": "admin",
+        "role": "ADMIN"
+      },
+      "ip_address": "::1",
+      "timestamp": "2026-10-06T21:15:17.987Z"
+    },
+    {
+      "id": "log_72987c50-9223-4752-b2cb-6d87a2599a7f",
+      "actor": "الزائر",
+      "action": "CANCEL_BOOKING",
+      "entity_type": "booking",
+      "entity_id": "bk_915d37fc-bad7-47ad-8ace-3a3d81c60ecc",
+      "details": {
+        "booking_ref": "HJ-2026-3213",
+        "name": "طارق عبدالكريم"
+      },
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-10-06T17:00:07.022Z"
+    },
+    {
+      "id": "log_8412d656-c604-451c-995a-cc8f020f7fc7",
+      "actor": "زائر",
+      "action": "CREATE_BOOKING",
+      "entity_type": "booking",
+      "entity_id": "bk_915d37fc-bad7-47ad-8ace-3a3d81c60ecc",
+      "details": {
+        "booking_ref": "HJ-2026-3213",
+        "name": "طارق عبدالكريم",
+        "persons": 1,
+        "slot": "2026-10-07 06:00"
+      },
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-10-06T17:00:06.980Z"
+    },
+    {
+      "id": "log_1cea402a-5ebf-4e92-b31a-8e830fd9542d",
+      "actor": "staff (STAFF)",
+      "action": "CHECK_IN_SUCCESS",
+      "entity_type": "booking",
+      "entity_id": "bk_6ef6a661-7f96-4b22-8a28-ab87dff86bf4",
+      "details": {
+        "booking_ref": "HJ-2026-6041",
+        "staff": "staff",
+        "visitor": "سالم أحمد المحمدي",
+        "persons": 2
+      },
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-10-06T17:00:06.971Z"
+    },
+    {
+      "id": "log_917c50ec-5ccf-46d1-a6e5-e2d8567cd0bf",
+      "actor": "زائر",
+      "action": "CREATE_BOOKING",
+      "entity_type": "booking",
+      "entity_id": "bk_6ef6a661-7f96-4b22-8a28-ab87dff86bf4",
+      "details": {
+        "booking_ref": "HJ-2026-6041",
+        "name": "سالم أحمد المحمدي",
+        "persons": 2,
+        "slot": "2026-10-06 22:00"
+      },
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-10-06T17:00:06.774Z"
+    },
+    {
+      "id": "log_seed_01",
+      "actor": "admin (ADMIN)",
+      "action": "SYSTEM_INITIALIZATION",
+      "entity_type": "system",
+      "entity_id": "init",
+      "details": {
+        "message": "تهيئة النظام والمواعيد التجريبية بنجاح"
+      },
+      "ip_address": "127.0.0.1",
+      "timestamp": "2026-10-06T17:00:06.761Z"
+    }
+  ],
+  "settings": {
+    "platform_name": "منصة تنظيم مواعيد دخول الحِجر",
+    "platform_subtitle": "نظام حجز إلكتروني مستقل لتنظيم مواعيد الزيارة بسلاسة وأمان",
+    "disclaimer": "تنبيه تنظيمي: هذه منصة حجز مستقلة لتنظيم المواعيد والتفويج وليست جهة حكومية رسمية، ولا تُعد بديلاً عن التصاريح الرسمية المعتمدة من الجهات المختصة.",
+    "contact_phone": "920000000",
+    "contact_email": "support@alhijr-booking.local",
+    "max_persons_per_booking": 7,
+    "allow_cancellation": true,
+    "cancellation_hours_before": 2,
+    "default_slot_capacity": 200,
+    "instructions_text": "يرجى الحضور قبل الموعد بـ 15 دقيقة، وإبراز التذكرة الإلكترونية والرمز QR لموظف التنظيم عند البوابة، والالتزام بالزي المناسب والهدوء داخل الحرم الشريف."
+  }
+}

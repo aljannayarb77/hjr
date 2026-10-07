@@ -618,4 +618,77 @@ function setupModalsAndActions() {
       }
     });
   }
+
+  // تصدير وتحميل قاعدة البيانات JSON
+  const btnExportDb = document.getElementById('btn-export-db');
+  if (btnExportDb) {
+    btnExportDb.addEventListener('click', () => {
+      try {
+        const db = typeof getDemoDb === 'function' ? getDemoDb() : {};
+        const jsonStr = JSON.stringify(db, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'database.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('تم تحميل نسخة كاملة من قاعدة البيانات (database.json) بنجاح ✓', 'success');
+      } catch (err) {
+        showToast('فشل تصدير قاعدة البيانات.', 'error');
+      }
+    });
+  }
+
+  // استيراد قاعدة بيانات من ملف JSON
+  const btnImportTrigger = document.getElementById('btn-import-db-trigger');
+  const fileInput = document.getElementById('db-file-input');
+  if (btnImportTrigger && fileInput) {
+    btnImportTrigger.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        try {
+          const parsed = JSON.parse(evt.target.result);
+          if (!parsed.bookings || !parsed.users) {
+            throw new Error('الملف لا يحتوي على بيانات صالحة للمنصة.');
+          }
+          if (typeof saveDemoDb === 'function') {
+            saveDemoDb(parsed);
+          } else {
+            localStorage.setItem('alhijr_demo_db', JSON.stringify(parsed));
+          }
+          showToast('تم استيراد وتحديث قاعدة البيانات بنجاح! ✓', 'success');
+          loadDashboardStats();
+          loadBookingsList(1);
+          loadAppointmentsList();
+          loadUsersList();
+        } catch (err) {
+          showToast('فشل قراءة الملف: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      fileInput.value = '';
+    });
+  }
+
+  // استعادة قاعدة البيانات الأصلية التأسيسية
+  const btnResetDb = document.getElementById('btn-reset-db');
+  if (btnResetDb) {
+    btnResetDb.addEventListener('click', async () => {
+      if (!confirm('هل أنت متأكد من استعادة قاعدة البيانات الأصلية التأسيسية؟ سيتم تعيين الحجوزات والمشرفين إلى الحالة الأولية الكاملة.')) return;
+      try {
+        await apiRequest('/database/reset', { method: 'POST' });
+        showToast('تمت استعادة قاعدة البيانات الأصلية بنجاح ✓', 'success');
+        loadDashboardStats();
+        loadBookingsList(1);
+        loadAppointmentsList();
+        loadUsersList();
+      } catch (err) {
+        showToast('فشل استعادة قاعدة البيانات.', 'error');
+      }
+    });
+  }
 }

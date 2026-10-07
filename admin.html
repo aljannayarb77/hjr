@@ -588,6 +588,48 @@
             </button>
           </form>
         </div>
+
+        <!-- إدارة قاعدة البيانات والنسخ الاحتياطي -->
+        <div class="booking-card" style="margin-top: 24px; border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div style="width: 36px; height: 36px; background: rgba(197, 160, 89, 0.15); color: var(--gold-dark); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+              💾
+            </div>
+            <div>
+              <h3 style="font-size: 1.25rem; color: var(--primary); margin: 0;">إدارة قاعدة البيانات والنسخ الاحتياطي (Database Tools)</h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem; margin: 0;">تحميل وتصدير قاعدة البيانات الحالية بصيغة JSON، أو استيراد بيانات سابقة، أو استعادة البيانات التأسيسية الأصلية</p>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px dashed var(--border);">
+            <button type="button" id="btn-export-db" class="btn btn-secondary btn-sm">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              <span>تصدير وتحميل قاعدة البيانات (JSON)</span>
+            </button>
+
+            <button type="button" id="btn-import-db-trigger" class="btn btn-secondary btn-sm">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              <span>استيراد قاعدة بيانات من ملف (JSON)</span>
+            </button>
+            <input type="file" id="db-file-input" accept=".json" style="display: none;">
+
+            <button type="button" id="btn-reset-db" class="btn btn-outline-gold btn-sm" style="color: #DC2626; border-color: #DC2626;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
+              </svg>
+              <span>استعادة قاعدة البيانات الأصلية</span>
+            </button>
+          </div>
+        </div>
       </section>
 
       <!-- ================= 6. تبويب المستخدمين والمشرفين ================= -->
