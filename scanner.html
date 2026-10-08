@@ -70,7 +70,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <nav class="navbar" style="height: 68px;">
+      <nav class="navbar">
         <div class="brand-logo" style="font-size: 1.15rem;">
           <div class="brand-icon" style="width: 38px; height: 38px;">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -87,7 +87,9 @@
         </div>
 
         <div class="nav-actions">
-          <button id="btn-toggle-theme" class="btn btn-secondary btn-sm" title="تبديل المظهر">🌙 الوضع الداكن</button>
+          <button id="btn-toggle-theme" class="btn btn-secondary btn-sm" title="تبديل المظهر" aria-label="تبديل المظهر">
+            <span class="theme-icon">🌙</span> <span class="theme-text">الوضع الداكن</span>
+          </button>
           <a href="admin.html" class="btn btn-secondary btn-sm">لوحة الإدارة</a>
           <button id="btn-staff-logout" class="btn btn-outline-gold btn-sm">خروج</button>
         </div>

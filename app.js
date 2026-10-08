@@ -953,7 +953,11 @@ function updateThemeButton() {
   const btn = document.getElementById('btn-toggle-theme');
   if (btn) {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    btn.innerHTML = isDark ? '☀️ الوضع الفاتح' : '🌙 الوضع الداكن';
+    const icon = isDark ? '☀️' : '🌙';
+    const text = isDark ? 'الوضع الفاتح' : 'الوضع الداكن';
+    btn.innerHTML = `<span class="theme-icon">${icon}</span> <span class="theme-text">${text}</span>`;
+    btn.setAttribute('aria-label', text);
+    btn.setAttribute('title', text);
   }
 }
 
