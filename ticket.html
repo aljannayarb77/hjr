@@ -136,14 +136,59 @@
         return;
       }
 
+      let booking = null;
       try {
         const data = await apiRequest(`/bookings/${ref}`);
         if (data.success && data.booking) {
-          render(data.booking);
-        } else {
-          showError();
+          booking = data.booking;
         }
-      } catch (e) {
+      } catch (e) {}
+
+      // في حال فتح الرابط على جهاز جديد بدون وجود الحجز في التخزين المحلي، يتم استخراجه من معلمات الرابط المعتمدة
+      if (!booking && params.get('name')) {
+        const name = params.get('name') || '';
+        const natId = params.get('id') || '';
+        const phone = params.get('phone') || '';
+        const persons = parseInt(params.get('p'), 10) || 1;
+        const date = params.get('date') || '';
+        const timeRange = params.get('time') || '08:00 - 10:00';
+        const parts = timeRange.split('-');
+        const token = params.get('token') || `HJ-V1-${ref}`;
+        const status = params.get('st') || 'CONFIRMED';
+
+        booking = {
+          id: `bk_${Date.now()}`,
+          booking_ref: ref,
+          national_id: natId,
+          phone: phone,
+          full_name: name,
+          nationality: 'سعودي',
+          persons_count: persons,
+          special_needs: false,
+          status: status,
+          qr_token: token,
+          qr_image: typeof makeQrImageUrl === 'function' ? makeQrImageUrl(window.location.href) : `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(window.location.href)}`,
+          created_at: new Date().toISOString(),
+          appointment: {
+            date: date,
+            start_time: parts[0] ? parts[0].trim() : '08:00',
+            end_time: parts[1] ? parts[1].trim() : '10:00',
+            notes: 'فترة دخول الحِجر'
+          }
+        };
+
+        try {
+          const db = getDemoDb();
+          if (db && Array.isArray(db.bookings) && !db.bookings.some(b => b.booking_ref === ref)) {
+            db.bookings.unshift(booking);
+            saveDemoDb(db);
+          }
+        } catch (storageErr) {}
+      }
+
+      if (booking) {
+        render(booking);
+      } else {
         showError();
       }
     });

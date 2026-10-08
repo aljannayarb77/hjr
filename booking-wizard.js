@@ -367,7 +367,19 @@ function handleShareTicket() {
 الوقت: ${formatSlotRange(app.start_time, app.end_time)} (مدة الزيارة: ساعتان)
 عدد الأفراد: ${confirmedBookingData.persons_count}`;
 
-  const ticketUrl = new URL(`ticket.html?ref=${confirmedBookingData.booking_ref}&token=${confirmedBookingData.qr_token}`, window.location.href).href;
+  const timeRange = `${app.start_time || '08:00'}-${app.end_time || '10:00'}`;
+  let ticketUrl = confirmedBookingData.qr_payload;
+  if (!ticketUrl) {
+    const pRef = encodeURIComponent(confirmedBookingData.booking_ref || '');
+    const pToken = encodeURIComponent(confirmedBookingData.qr_token || '');
+    const pName = encodeURIComponent(confirmedBookingData.full_name || '');
+    const pId = encodeURIComponent(confirmedBookingData.national_id || '');
+    const pPhone = encodeURIComponent(confirmedBookingData.phone || '');
+    const pDate = encodeURIComponent(app.date || '');
+    const pTime = encodeURIComponent(timeRange);
+    const pCount = encodeURIComponent(confirmedBookingData.persons_count || 1);
+    ticketUrl = new URL(`ticket.html?ref=${pRef}&token=${pToken}&name=${pName}&id=${pId}&phone=${pPhone}&date=${pDate}&time=${pTime}&p=${pCount}&st=CONFIRMED`, window.location.href).href;
+  }
 
   if (navigator.share) {
     navigator.share({

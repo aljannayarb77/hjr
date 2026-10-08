@@ -136,6 +136,7 @@
 html {
   font-size: 16px;
   scroll-behavior: smooth;
+  scroll-padding-top: 85px;
   direction: rtl;
 }
 
@@ -1418,24 +1419,60 @@ button, input, select, textarea {
     background: var(--bg-surface);
     color: var(--text-main);
     flex-direction: column;
-    padding: 16px 20px;
+    padding: 14px 18px;
     border-bottom: 2px solid var(--border);
-    box-shadow: var(--shadow-lg);
-    gap: 8px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    gap: 6px;
     z-index: 1000;
   }
 
   [data-theme="dark"] .nav-links {
     background: #0B221B;
     border-bottom-color: #183B30;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.5);
   }
 
   .nav-links.show {
     display: flex;
+    animation: menuSlideDown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes menuSlideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .nav-links .nav-link {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 0.98rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .nav-links .nav-link:active {
+    background: var(--primary-subtle);
   }
 
   .mobile-toggle {
     display: inline-flex;
+  }
+
+  .mobile-toggle.active {
+    background: var(--primary-subtle);
+    border-color: var(--gold);
+    color: var(--primary);
+  }
+
+  [data-theme="dark"] .mobile-toggle.active {
+    background: #143B30;
+    border-color: var(--gold);
+    color: #2DD4BF;
   }
 
   .mobile-nav-admin {

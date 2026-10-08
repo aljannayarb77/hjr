@@ -114,6 +114,9 @@ function stopScanner() {
 
 // إرسال الكود للتحقق منه عبر السيرفر
 async function processQrData(qrCode) {
+  const cleanCode = (qrCode || '').trim();
+  if (!cleanCode) return;
+
   const resultCard = document.getElementById('scan-result-card');
   resultCard.style.display = 'block';
   resultCard.className = 'result-modal result-warning';
@@ -126,11 +129,13 @@ async function processQrData(qrCode) {
   try {
     const res = await apiRequest('/qr/verify', {
       method: 'POST',
-      body: JSON.stringify({ qr_data: qrCode })
+      body: JSON.stringify({ qr_data: cleanCode })
     });
 
-    if (res.success && res.result) {
-      renderVerificationResult(res.result);
+    if (res.success && (res.result || res.booking)) {
+      renderVerificationResult(res.result || res);
+    } else {
+      renderErrorResult(res.message || 'رمز QR غير صالح أو غير مسجل في النظام.');
     }
   } catch (err) {
     showToast(err.message || 'فشل التحقق من الرمز.', 'error');
@@ -143,11 +148,12 @@ function renderVerificationResult(res) {
   const card = document.getElementById('scan-result-card');
   card.style.display = 'block';
 
-  const booking = res.booking;
-  const app = res.appointment;
+  const booking = res.booking || (res.result && res.result.booking);
+  const app = res.appointment || (booking ? booking.appointment : null) || (res.result && res.result.appointment);
+  const status = res.status || res.code || (res.valid ? 'VALID' : 'INVALID');
 
   // 1. حالة الحجز صالح ومؤكد
-  if (res.status === 'VALID' && booking) {
+  if (status === 'VALID' && booking) {
     playSound('success');
     currentVerifiedBooking = booking;
     card.className = 'result-modal result-valid';
@@ -209,7 +215,7 @@ function renderVerificationResult(res) {
   }
 
   // 2. حالة الحجز مستخدم مسبقاً
-  if (res.status === 'ALREADY_USED') {
+  if (status === 'ALREADY_USED') {
     playSound('warning');
     card.className = 'result-modal result-warning';
     card.innerHTML = `
@@ -222,7 +228,7 @@ function renderVerificationResult(res) {
       <div style="background: #FFFFFF; border: 1px solid #FDE68A; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
         <p style="font-size: 0.92rem; margin-bottom: 6px;"><strong>صاحب الحجز:</strong> ${booking ? booking.full_name : '-'}</p>
         <p style="font-size: 0.92rem; margin-bottom: 6px;"><strong>رقم الحجز:</strong> ${booking ? booking.booking_ref : '-'}</p>
-        <p style="font-size: 0.92rem; color: #DC2626;"><strong>تاريخ ووقت الاستخدام السابق:</strong> ${res.used_at ? res.used_at.replace('T', ' ').substring(0, 19) : 'مسجل كمستخدم'}</p>
+        <p style="font-size: 0.92rem; color: #DC2626;"><strong>تاريخ ووقت الاستخدام السابق:</strong> ${(res.used_at || (booking && booking.used_at)) ? (res.used_at || booking.used_at).replace('T', ' ').substring(0, 19) : 'مسجل كمستخدم'}</p>
       </div>
 
       <button type="button" class="btn btn-secondary btn-lg btn-block btn-next-scan">
@@ -234,7 +240,7 @@ function renderVerificationResult(res) {
   }
 
   // 3. حالة الحجز ملغى
-  if (res.status === 'CANCELLED') {
+  if (status === 'CANCELLED') {
     playSound('error');
     card.className = 'result-modal result-danger';
     card.innerHTML = `

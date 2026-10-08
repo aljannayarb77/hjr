@@ -85,6 +85,37 @@ async function apiRequest(endpoint, options = {}) {
 // محاكي الـ API التفاعلي وقاعدة البيانات المتكاملة (للتشغيل المباشر على GitHub Pages)
 // ============================================================================
 
+// دالة توحيد وتحويل الأرقام العربية والشرقية إلى الإنجليزية وإزالة الفراغات الزائدة
+function normalizeInputString(str) {
+  if (str === null || str === undefined) return '';
+  const arabicIndicDigits = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const easternArabicDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
+  return String(str)
+    .replace(/[٠-٩]/g, d => arabicIndicDigits.indexOf(d))
+    .replace(/[۰-۹]/g, d => easternArabicDigits.indexOf(d))
+    .trim();
+}
+
+// توليد رابط التحقق الذكي المضمن بكامل بيانات التذكرة ليعمل عبر جميع الأجهزة دون وسيط
+function makeSmartQrPayload(ref, token, name, natId, phone, date, timeRange, persons, status) {
+  const pName = encodeURIComponent(name || '');
+  const pId = encodeURIComponent(natId || '');
+  const pPhone = encodeURIComponent(phone || '');
+  const pDate = encodeURIComponent(date || '');
+  const pTime = encodeURIComponent(timeRange || '08:00-10:00');
+  const pCount = encodeURIComponent(persons || 1);
+  const pStatus = encodeURIComponent(status || 'CONFIRMED');
+  const pToken = encodeURIComponent(token || '');
+  const pRef = encodeURIComponent(ref || '');
+
+  return `https://aljannayarb77.github.io/hjr/ticket.html?ref=${pRef}&token=${pToken}&name=${pName}&id=${pId}&phone=${pPhone}&date=${pDate}&time=${pTime}&p=${pCount}&st=${pStatus}`;
+}
+
+// توليد رابط صورة الباركود QR بدقة عالية
+function makeQrImageUrl(payloadStr) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(payloadStr)}`;
+}
+
 function getDefaultDatabase() {
   const today = new Date();
   const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -92,6 +123,14 @@ function getDefaultDatabase() {
   const tmrw = new Date(today);
   tmrw.setDate(today.getDate() + 1);
   const tmrwStr = `${tmrw.getFullYear()}-${String(tmrw.getMonth() + 1).padStart(2, '0')}-${String(tmrw.getDate()).padStart(2, '0')}`;
+
+  const demo01Payload = makeSmartQrPayload('HJ-2026-1001', 'HJ-V1-39f432eca0560844-e5d85021702d69ca', 'محمد عبدالله باوزير', '1088765432', '0555123456', todayStr, '22:00-00:00', 2, 'CONFIRMED');
+  const demo02Payload = makeSmartQrPayload('HJ-2026-1002', 'HJ-V1-61a79cb698e8f45d-167cfe1eb02103cc', 'أحمد إبراهيم الدوسري', '1099887766', '0501239876', todayStr, '06:00-08:00', 1, 'USED');
+  const demo03Payload = makeSmartQrPayload('HJ-2026-1003', 'HJ-V1-2b21d5d10115b40d-836186c870ace34b', 'فهد سالم العتيبي', '1044556677', '0567890123', todayStr, '10:00-12:00', 3, 'CANCELLED');
+  const demo04Payload = makeSmartQrPayload('HJ-2026-1004', 'HJ-V1-bf5a482b4fe67b54-de98f789aa72025a', 'عمر خالد المنصوري', '2033445566', '0544332211', tmrwStr, '13:00-15:00', 1, 'CONFIRMED');
+  const demo05Payload = makeSmartQrPayload('HJ-2026-8812', 'HJ-V1-8812-moroj-ghamdi', 'مروج يعقوب الغامدي', '1099887766', '0599112233', todayStr, '08:00-10:00', 2, 'CONFIRMED');
+  const demo06Payload = makeSmartQrPayload('HJ-2026-6041', 'HJ-V1-e127489fabcce7a0-0e413886a339ef23', 'سالم أحمد المحمدي', '1122334455', '0599112233', todayStr, '06:00-08:00', 2, 'USED');
+  const demo07Payload = makeSmartQrPayload('HJ-2026-3213', 'HJ-V1-6ed2e4add9f12ae3-cbf5616aeac197b2', 'طارق عبدالكريم', '1555555555', '0577777777', todayStr, '06:00-08:00', 1, 'CANCELLED');
 
   return {
     users: [
@@ -111,7 +150,7 @@ function getDefaultDatabase() {
         special_needs: false,
         status: 'CONFIRMED',
         appointment_id: `app_${todayStr}_0800`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-8812',
+        qr_image: makeQrImageUrl(demo05Payload),
         qr_token: 'HJ-V1-8812-moroj-ghamdi',
         created_at: new Date(Date.now() - 3600000).toISOString(),
         appointment: {
@@ -132,7 +171,7 @@ function getDefaultDatabase() {
         special_needs: false,
         status: 'CONFIRMED',
         appointment_id: `app_${todayStr}_2200`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1001',
+        qr_image: makeQrImageUrl(demo01Payload),
         qr_token: 'HJ-V1-39f432eca0560844-e5d85021702d69ca',
         created_at: new Date(Date.now() - 7200000).toISOString(),
         appointment: {
@@ -154,7 +193,7 @@ function getDefaultDatabase() {
         status: 'USED',
         used_at: new Date(Date.now() - 14400000).toISOString(),
         appointment_id: `app_${todayStr}_0600`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1002',
+        qr_image: makeQrImageUrl(demo02Payload),
         qr_token: 'HJ-V1-61a79cb698e8f45d-167cfe1eb02103cc',
         created_at: new Date(Date.now() - 28800000).toISOString(),
         appointment: {
@@ -176,7 +215,7 @@ function getDefaultDatabase() {
         status: 'CANCELLED',
         cancelled_at: new Date(Date.now() - 18000000).toISOString(),
         appointment_id: `app_${todayStr}_1000`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1003',
+        qr_image: makeQrImageUrl(demo03Payload),
         qr_token: 'HJ-V1-2b21d5d10115b40d-836186c870ace34b',
         created_at: new Date(Date.now() - 36000000).toISOString(),
         appointment: {
@@ -197,7 +236,7 @@ function getDefaultDatabase() {
         special_needs: false,
         status: 'CONFIRMED',
         appointment_id: `app_${tmrwStr}_1300`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-1004',
+        qr_image: makeQrImageUrl(demo04Payload),
         qr_token: 'HJ-V1-bf5a482b4fe67b54-de98f789aa72025a',
         created_at: new Date(Date.now() - 7200000).toISOString(),
         appointment: {
@@ -219,7 +258,7 @@ function getDefaultDatabase() {
         status: 'USED',
         used_at: new Date(Date.now() - 7200000).toISOString(),
         appointment_id: `app_${todayStr}_0600`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-6041',
+        qr_image: makeQrImageUrl(demo06Payload),
         qr_token: 'HJ-V1-e127489fabcce7a0-0e413886a339ef23',
         created_at: new Date(Date.now() - 25000000).toISOString(),
         appointment: {
@@ -241,7 +280,7 @@ function getDefaultDatabase() {
         status: 'CANCELLED',
         cancelled_at: new Date(Date.now() - 10000000).toISOString(),
         appointment_id: `app_${todayStr}_0600`,
-        qr_image: 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=HJ-2026-3213',
+        qr_image: makeQrImageUrl(demo07Payload),
         qr_token: 'HJ-V1-6ed2e4add9f12ae3-cbf5616aeac197b2',
         created_at: new Date(Date.now() - 20000000).toISOString(),
         appointment: {
@@ -475,9 +514,30 @@ async function handleClientDemoApi(endpoint, options = {}) {
 
   // 2a. POST /bookings/lookup (الاستعلام عن الحجز عبر inquiry.js)
   if (endpoint.startsWith('/bookings/lookup') && method === 'POST') {
-    const ref = (body.booking_ref || '').trim().toUpperCase();
-    const phone = (body.phone || '').trim();
-    const b = db.bookings.find(x => x.booking_ref.toUpperCase() === ref && x.phone === phone);
+    const rawRef = normalizeInputString(body.booking_ref || '').toUpperCase();
+    const rawPhone = normalizeInputString(body.phone || '').replace(/[\s\-_]/g, '');
+
+    const b = db.bookings.find(x => {
+      const bRef = normalizeInputString(x.booking_ref || '').toUpperCase();
+      const bPhone = normalizeInputString(x.phone || '').replace(/[\s\-_]/g, '');
+      const bNatId = normalizeInputString(x.national_id || '').trim();
+
+      // فحص تطابق رقم الحجز
+      let refMatches = (bRef === rawRef);
+      if (!refMatches && rawRef.length >= 4) {
+        const refDigits = bRef.replace(/\D/g, '');
+        const inDigits = rawRef.replace(/\D/g, '');
+        if (inDigits.length >= 4 && refDigits.endsWith(inDigits)) {
+          refMatches = true;
+        }
+      }
+
+      // فحص تطابق رقم الجوال أو الهوية
+      const phoneMatches = (bPhone === rawPhone || bPhone.endsWith(rawPhone) || rawPhone.endsWith(bPhone) || bNatId === rawPhone);
+
+      return refMatches && phoneMatches;
+    });
+
     if (!b) throw new Error('لم يتم العثور على أي حجز مطابق لبيانات الاستعلام المدخلة.');
     return { success: true, booking: b };
   }
@@ -485,7 +545,7 @@ async function handleClientDemoApi(endpoint, options = {}) {
   // 2b. GET /bookings (قائمة الحجوزات للوحة التحكم مع الفلترة والبحث والترقيم)
   if ((endpoint.startsWith('/bookings?') || endpoint === '/bookings') && method === 'GET') {
     const url = new URL('http://dummy' + endpoint);
-    const search = (url.searchParams.get('search') || '').trim().toLowerCase();
+    const search = normalizeInputString(url.searchParams.get('search') || '').toLowerCase();
     const status = url.searchParams.get('status');
     const date = url.searchParams.get('date');
     const page = parseInt(url.searchParams.get('page'), 10) || 1;
@@ -497,8 +557,8 @@ async function handleClientDemoApi(endpoint, options = {}) {
       filtered = filtered.filter(b => 
         (b.booking_ref && b.booking_ref.toLowerCase().includes(search)) ||
         (b.full_name && b.full_name.toLowerCase().includes(search)) ||
-        (b.national_id && b.national_id.includes(search)) ||
-        (b.phone && b.phone.includes(search))
+        (b.national_id && normalizeInputString(b.national_id).includes(search)) ||
+        (b.phone && normalizeInputString(b.phone).includes(search))
       );
     }
 
@@ -525,7 +585,7 @@ async function handleClientDemoApi(endpoint, options = {}) {
     };
   }
 
-  // 2c. POST /bookings (إنشاء حجز جديد)
+  // 2c. POST /bookings (إنشاء حجز جديد وتوليد باركود ذكي معتمد)
   if (endpoint === '/bookings' && method === 'POST') {
     const { appointment_id, full_name, phone, national_id, nationality, persons_count, special_needs } = body;
     const count = parseInt(persons_count, 10) || 1;
@@ -536,14 +596,20 @@ async function handleClientDemoApi(endpoint, options = {}) {
       db.appointments.push(app);
     }
 
-    const duplicate = db.bookings.find(b => b.national_id === national_id && b.status === 'CONFIRMED' && b.appointment?.date === app.date);
+    const cleanNatId = normalizeInputString(national_id);
+    const cleanPhone = normalizeInputString(phone);
+    const duplicate = db.bookings.find(b => normalizeInputString(b.national_id) === cleanNatId && b.status === 'CONFIRMED' && b.appointment?.date === app.date);
     if (duplicate) {
-      throw new Error(`يوجد حجز مؤكد مسبقاً بنفس رقم الهوية (${national_id}) في نفس هذا اليوم.`);
+      throw new Error(`يوجد حجز مؤكد مسبقاً بنفس رقم الهوية (${cleanNatId}) في نفس هذا اليوم.`);
     }
 
     const ref = `HJ-2026-${Math.floor(1000 + Math.random() * 9000)}`;
-    const qrToken = `alhijr_${ref}_${Date.now()}`;
-    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrToken)}`;
+    const qrToken = `HJ-V1-${Date.now().toString(16)}-${Math.random().toString(16).substring(2, 8)}`;
+    const timeRange = `${app.start_time || '08:00'}-${app.end_time || '10:00'}`;
+
+    // توليد حمولة التحقق الذكية الكاملة التي تجعل الباركود يعمل على كل الشاشات والهواتف
+    const qrPayload = makeSmartQrPayload(ref, qrToken, full_name, cleanNatId, cleanPhone, app.date, timeRange, count, 'CONFIRMED');
+    const qrUrl = makeQrImageUrl(qrPayload);
 
     app.booked_count = (app.booked_count || 0) + count;
 
@@ -551,15 +617,16 @@ async function handleClientDemoApi(endpoint, options = {}) {
       id: `bk_${Date.now()}`,
       booking_ref: ref,
       appointment_id,
-      national_id,
-      phone,
-      full_name,
+      national_id: cleanNatId,
+      phone: cleanPhone,
+      full_name: full_name.trim(),
       nationality: nationality || 'سعودي',
       persons_count: count,
       special_needs: !!special_needs,
       status: 'CONFIRMED',
       qr_token: qrToken,
       qr_image: qrUrl,
+      qr_payload: qrPayload,
       created_at: new Date().toISOString(),
       appointment: { ...app }
     };
@@ -580,8 +647,12 @@ async function handleClientDemoApi(endpoint, options = {}) {
 
   // 2d. GET /bookings/:ref (عرض تفاصيل التذكرة الفردية)
   if (endpoint.startsWith('/bookings/') && !endpoint.includes('inquire') && !endpoint.includes('cancel') && !endpoint.includes('lookup') && !endpoint.includes('manual-checkin') && !endpoint.includes('resend-ticket') && method === 'GET') {
-    const ref = endpoint.replace('/bookings/', '').split('?')[0];
-    const b = db.bookings.find(x => x.booking_ref.toUpperCase() === ref.toUpperCase() || x.id === ref);
+    const rawRef = endpoint.replace('/bookings/', '').split('?')[0];
+    const cleanRef = normalizeInputString(decodeURIComponent(rawRef)).toUpperCase();
+    const b = db.bookings.find(x => {
+      const bRef = (x.booking_ref || '').toUpperCase();
+      return bRef === cleanRef || x.id === cleanRef || (cleanRef.length >= 4 && bRef.replace(/\D/g, '').endsWith(cleanRef.replace(/\D/g, '')));
+    });
     if (!b) throw new Error('لم يتم العثور على التذكرة أو الحجز.');
     return { success: true, booking: b };
   }
@@ -680,41 +751,180 @@ async function handleClientDemoApi(endpoint, options = {}) {
     return { success: true, message: 'تم حذف المستخدم بنجاح.' };
   }
 
-  // 5a. POST /qr/verify (التحقق من رمز QR)
+  // 5a. POST /qr/verify (التحقق من رمز QR ومطابقته)
   if (endpoint === '/qr/verify' && method === 'POST') {
     const raw = (body.qr_data || body.token || '').trim();
-    const b = db.bookings.find(x => 
-      x.qr_token === raw || 
-      x.booking_ref.toUpperCase() === raw.toUpperCase() ||
-      raw.includes(x.booking_ref) ||
-      (x.qr_token && raw.includes(x.qr_token))
-    );
-    if (!b) throw new Error('رمز QR غير صالح أو غير مسجل في السجلات.');
-    
-    let code = 'VALID';
-    let message = 'التصريح صالح ومؤكد لدخول الحِجر ✓';
+    if (!raw) {
+      throw new Error('لم يتم استلام أي رمز QR أو رقم حجز للتحقق منه.');
+    }
+
+    const cleanRaw = normalizeInputString(raw);
+    const upperRaw = cleanRaw.toUpperCase();
+
+    // 1. استخراج المعلمات من الرابط أو التوكن إن وجدت
+    let extractedRef = '';
+    let extractedToken = '';
+    let extractedName = '';
+    let extractedId = '';
+    let extractedPhone = '';
+    let extractedDate = '';
+    let extractedTime = '';
+    let extractedPersons = 1;
+    let extractedStatus = 'CONFIRMED';
+
+    try {
+      let urlStr = raw;
+      if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
+        if (urlStr.includes('ref=') || urlStr.includes('token=')) {
+          urlStr = 'http://dummy.local/?' + urlStr.replace(/^\?/, '');
+        }
+      }
+      if (urlStr.startsWith('http://') || urlStr.startsWith('https://')) {
+        const parsedUrl = new URL(urlStr);
+        extractedRef = normalizeInputString(parsedUrl.searchParams.get('ref') || '').toUpperCase();
+        extractedToken = (parsedUrl.searchParams.get('token') || '').trim();
+        extractedName = (parsedUrl.searchParams.get('name') || '').trim();
+        extractedId = normalizeInputString(parsedUrl.searchParams.get('id') || '').trim();
+        extractedPhone = normalizeInputString(parsedUrl.searchParams.get('phone') || '').trim();
+        extractedDate = (parsedUrl.searchParams.get('date') || '').trim();
+        extractedTime = (parsedUrl.searchParams.get('time') || '').trim();
+        extractedPersons = parseInt(parsedUrl.searchParams.get('p'), 10) || 1;
+        extractedStatus = (parsedUrl.searchParams.get('st') || 'CONFIRMED').toUpperCase();
+      }
+    } catch (e) {}
+
+    // 2. البحث في قاعدة البيانات المحلية
+    let b = db.bookings.find(x => {
+      const bRef = (x.booking_ref || '').toUpperCase();
+      const bToken = x.qr_token || '';
+      const bId = (x.id || '').toUpperCase();
+      const bNatId = normalizeInputString(x.national_id || '');
+      const bPhone = normalizeInputString(x.phone || '');
+
+      // تطابق بالرقم أو التوكن المستخرج
+      if (extractedRef && bRef === extractedRef) return true;
+      if (extractedToken && bToken === extractedToken) return true;
+
+      // تطابق مباشر
+      if (bToken && bToken === cleanRaw) return true;
+      if (bRef && bRef === upperRaw) return true;
+      if (bId && bId === upperRaw) return true;
+
+      // تطابق بالاحتواء
+      if (bRef && upperRaw.includes(bRef)) return true;
+      if (bToken && upperRaw.includes(bToken)) return true;
+
+      // أرقام الحجز (مثلاً لو كتب 1001 أو 2026-1001)
+      const refDigits = bRef.replace(/\D/g, '');
+      const inputDigits = cleanRaw.replace(/\D/g, '');
+      if (inputDigits.length >= 4 && refDigits.endsWith(inputDigits)) return true;
+
+      // تطابق برقم الهوية
+      if (bNatId && bNatId === cleanRaw) return true;
+
+      // تطابق برقم الجوال
+      if (bPhone && (bPhone === cleanRaw || bPhone.endsWith(cleanRaw) || cleanRaw.endsWith(bPhone))) return true;
+
+      return false;
+    });
+
+    // 3. في حال كان الرمز محمولاً من جهاز آخر ولم يتم تخزينه بعد في هذا المتصفح
+    if (!b && extractedRef && extractedName) {
+      const slotTimes = extractedTime.split('-');
+      const startT = slotTimes[0] ? slotTimes[0].trim() : '08:00';
+      const endT = slotTimes[1] ? slotTimes[1].trim() : '10:00';
+      const appDate = extractedDate || new Date().toISOString().split('T')[0];
+
+      b = {
+        id: `bk_${Date.now()}`,
+        booking_ref: extractedRef,
+        national_id: extractedId || '1000000000',
+        phone: extractedPhone || '0500000000',
+        full_name: extractedName,
+        nationality: 'سعودي',
+        persons_count: extractedPersons,
+        special_needs: false,
+        status: extractedStatus || 'CONFIRMED',
+        qr_token: extractedToken || `HJ-V1-${extractedRef}`,
+        qr_image: makeQrImageUrl(raw),
+        created_at: new Date().toISOString(),
+        appointment: {
+          id: `app_${appDate}_${startT.replace(':', '')}`,
+          date: appDate,
+          start_time: startT,
+          end_time: endT,
+          notes: 'فترة دخول الحِجر'
+        }
+      };
+
+      db.bookings.unshift(b);
+      db.audit_logs.unshift({
+        id: 'log_' + Date.now(),
+        actor: 'ماسح الباركود',
+        action: 'IMPORT_AND_VERIFY',
+        entity_type: 'booking',
+        entity_id: b.id,
+        details: `استيراد وتحقق فوري من تذكرة ${b.booking_ref} للزائر ${b.full_name}`,
+        timestamp: new Date().toISOString()
+      });
+      saveDemoDb(db);
+    }
+
+    if (!b) {
+      throw new Error('رمز QR غير صالح أو غير مسجل في السجلات.');
+    }
+
+    const app = b.appointment || (db.appointments ? db.appointments.find(a => a.id === b.appointment_id) : null) || {};
+    const todayStr = new Date().toISOString().split('T')[0];
+    let dateNotice = null;
+    if (app.date && app.date !== todayStr) {
+      dateNotice = `تنبيه: تاريخ الحجز (${app.date}) لا يطابق تاريخ اليوم (${todayStr}).`;
+    }
+
+    let statusCode = 'VALID';
+    let statusMessage = 'التصريح صالح ومؤكد لدخول الحِجر ✓';
     if (b.status === 'USED') {
-      code = 'ALREADY_USED';
-      message = 'تم استخدام هذه التذكرة مسبقاً والدخول بها!';
+      statusCode = 'ALREADY_USED';
+      statusMessage = 'تم استخدام هذه التذكرة مسبقاً والدخول بها!';
     } else if (b.status === 'CANCELLED') {
-      code = 'CANCELLED';
-      message = 'هذا الحجز ملغى مسبقاً من قبل الإدارة أو الزائر.';
+      statusCode = 'CANCELLED';
+      statusMessage = 'هذا الحجز ملغى مسبقاً من قبل الإدارة أو الزائر.';
     }
 
     const resObj = {
       valid: b.status === 'CONFIRMED',
-      code,
-      message,
-      booking: b
+      status: statusCode,       // متوافق مع scanner.js res.status
+      code: statusCode,         // متوافق مع res.code
+      message: statusMessage,
+      date_notice: dateNotice,
+      used_at: b.used_at || null,
+      booking: b,
+      appointment: app
     };
-    return { success: true, valid: b.status === 'CONFIRMED', result: resObj, booking: b };
+
+    return {
+      success: true,
+      valid: b.status === 'CONFIRMED',
+      status: statusCode,
+      code: statusCode,
+      result: resObj,
+      booking: b,
+      appointment: app
+    };
   }
 
   // 5b. POST /qr/check-in & /qr/checkin (تسجيل الدخول عند البوابة)
   if ((endpoint === '/qr/check-in' || endpoint === '/qr/checkin') && method === 'POST') {
-    const id = body.booking_id || body.token || '';
-    const b = db.bookings.find(x => x.id === id || x.qr_token === id || x.booking_ref.toUpperCase() === id.toUpperCase());
+    const id = normalizeInputString(body.booking_id || body.token || '');
+    const b = db.bookings.find(x => 
+      x.id === id || 
+      x.qr_token === id || 
+      (x.booking_ref && x.booking_ref.toUpperCase() === id.toUpperCase())
+    );
     if (!b) throw new Error('الحجز غير موجود.');
+    if (b.status === 'USED') {
+      throw new Error('تم تسجيل دخول هذه التذكرة مسبقاً!');
+    }
     b.status = 'USED';
     b.used_at = new Date().toISOString();
     db.audit_logs.unshift({
@@ -723,11 +933,11 @@ async function handleClientDemoApi(endpoint, options = {}) {
       action: 'CHECK_IN_SUCCESS',
       entity_type: 'booking',
       entity_id: b.id,
-      details: `تسجيل دخول وتفويج الزائر ${b.full_name} (${b.persons_count} أفراد)`,
+      details: `تسجيل دخول وتفويج الزائر ${b.full_name} (${b.persons_count} أفراد) - رقم الحجز ${b.booking_ref}`,
       timestamp: new Date().toISOString()
     });
     saveDemoDb(db);
-    return { success: true, message: 'تم تسجيل الدخول بنجاح.', booking: b };
+    return { success: true, message: 'تم تسجيل الدخول بنجاح ✓', booking: b };
   }
 
   // 6. GET /reports/dashboard (إحصائيات لوحة التحكم)
@@ -1119,8 +1329,71 @@ document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.querySelector('.mobile-toggle');
   const nav = document.querySelector('.nav-links');
   if (toggle && nav) {
-    toggle.addEventListener('click', () => {
-      nav.classList.toggle('show');
+    const iconMenu = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="3" y1="12" x2="21" y2="12"/>
+        <line x1="3" y1="6" x2="21" y2="6"/>
+        <line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>`;
+    const iconClose = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>`;
+
+    const closeMobileMenu = () => {
+      if (nav.classList.contains('show')) {
+        nav.classList.remove('show');
+        toggle.classList.remove('active');
+        toggle.innerHTML = iconMenu;
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'فتح القائمة');
+      }
+    };
+
+    const openMobileMenu = () => {
+      nav.classList.add('show');
+      toggle.classList.add('active');
+      toggle.innerHTML = iconClose;
+      toggle.setAttribute('aria-expanded', 'true');
+      toggle.setAttribute('aria-label', 'إغلاق القائمة');
+    };
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (nav.classList.contains('show')) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+
+    // 1. إغلاق القائمة تلقائياً وفوراً عند الضغط على أي خيار/رابط داخلها
+    nav.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        closeMobileMenu();
+      });
+    });
+
+    // 2. إغلاق القائمة عند النقر في أي مكان خارجها (على باقي الصفحة)
+    document.addEventListener('click', (e) => {
+      if (!nav.contains(e.target) && !toggle.contains(e.target)) {
+        closeMobileMenu();
+      }
+    });
+
+    // 3. إغلاق القائمة عند الضغط على مفتاح Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeMobileMenu();
+      }
+    });
+
+    // 4. إغلاق القائمة عند تغيير مقاس الشاشة للأجهزة الأكبر
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 991 && nav.classList.contains('show')) {
+        closeMobileMenu();
+      }
     });
   }
 
