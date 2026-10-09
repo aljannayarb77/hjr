@@ -134,8 +134,9 @@ function getDefaultDatabase() {
 
   return {
     users: [
-      { id: 'usr_admin_01', username: 'admin', full_name: 'ماجد محسن الشهري (المدير العام)', role: 'ADMIN', is_active: true, email: 'admin@alhijr.local', created_at: '2026-10-06T17:00:00.000Z' },
-      { id: 'usr_staff_01', username: 'staff', full_name: 'فهد الغامدي (مشرف الدخول والتفويج)', role: 'STAFF', is_active: true, email: 'staff@alhijr.local', created_at: '2026-10-06T17:00:00.000Z' }
+      { id: 'usr_admin_01', username: 'admin', password: 'admin123', full_name: 'ماجد محسن الشهري (المدير العام)', role: 'ADMIN', is_active: true, email: 'admin@alhijr.local', created_at: '2026-10-06T17:00:00.000Z' },
+      { id: 'usr_staff_01', username: 'staff', password: 'staff123', full_name: 'فهد الغامدي (مشرف الدخول والتفويج)', role: 'STAFF', is_active: true, email: 'staff@alhijr.local', created_at: '2026-10-06T17:00:00.000Z' },
+      { id: 'usr_staff_02', username: 'khalid', password: 'staff123', full_name: 'خالد الزهراني (مشرف البوابة)', role: 'STAFF', is_active: true, email: 'khalid@alhijr.local', created_at: '2026-10-08T10:00:00.000Z' }
     ],
     appointments: [],
     bookings: [
@@ -334,6 +335,56 @@ function getDemoDb() {
 
 function saveDemoDb(db) {
   localStorage.setItem('alhijr_demo_db', JSON.stringify(db));
+}
+
+// المزامنة التلقائية لقاعدة البيانات من ملف database.json للمستودع لتعمل عبر جميع الأجهزة
+async function syncDatabaseFromStaticFile() {
+  if (typeof window === 'undefined') return;
+  if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+    try {
+      const res = await fetch('database.json?_t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return;
+      const fileDb = await res.json();
+      if (!fileDb || (!Array.isArray(fileDb.users) && !Array.isArray(fileDb.bookings))) return;
+
+      let current = null;
+      try {
+        current = JSON.parse(localStorage.getItem('alhijr_demo_db') || 'null');
+      } catch (e) {}
+
+      if (!current || !Array.isArray(current.users)) {
+        current = fileDb;
+      } else {
+        // دمج المستخدمين من ملف database.json
+        (fileDb.users || []).forEach(fu => {
+          const uName = (fu.username || '').toLowerCase();
+          const existing = current.users.find(cu => (cu.username || '').toLowerCase() === uName);
+          if (!existing) {
+            current.users.push(fu);
+          } else {
+            if (fu.password && !existing.password) existing.password = fu.password;
+            if (fu.full_name && !existing.full_name) existing.full_name = fu.full_name;
+            if (fu.role && !existing.role) existing.role = fu.role;
+          }
+        });
+        // دمج الحجوزات من ملف database.json
+        if (!current.bookings) current.bookings = [];
+        (fileDb.bookings || []).forEach(fb => {
+          if (!current.bookings.some(cb => cb.booking_ref === fb.booking_ref)) {
+            current.bookings.push(fb);
+          }
+        });
+      }
+      localStorage.setItem('alhijr_demo_db', JSON.stringify(current));
+    } catch (e) {
+      // تجاهل أخطاء الشبكة أثناء العمل بدون إنترنت
+    }
+  }
+}
+
+// تشغيل المزامنة من الملف الثابت تلقائياً
+if (typeof window !== 'undefined' && (window.location.protocol === 'http:' || window.location.protocol === 'https:')) {
+  syncDatabaseFromStaticFile();
 }
 
 function ensureDemoAppointments(db) {
@@ -707,17 +758,23 @@ async function handleClientDemoApi(endpoint, options = {}) {
   // 3. POST /auth/login (تسجيل دخول المشرفين)
   if (endpoint === '/auth/login' && method === 'POST') {
     const { username, password } = body;
-    if (username === 'admin' && (password === 'admin123' || password === 'admin')) {
+    const cleanUser = normalizeInputString(username || '').trim().toLowerCase();
+    const cleanPass = normalizeInputString(password || '').trim();
+
+    if (cleanUser === 'admin' && (cleanPass === 'admin123' || cleanPass === 'admin')) {
       const u = { id: 'usr_admin_01', username: 'admin', full_name: 'ماجد محسن الشهري (المدير العام)', role: 'ADMIN' };
       return { success: true, token: 'demo-admin-token', user: u };
     }
-    if (username === 'staff' && (password === 'staff123' || password === 'staff')) {
+    if (cleanUser === 'staff' && (cleanPass === 'staff123' || cleanPass === 'staff')) {
       const u = { id: 'usr_staff_01', username: 'staff', full_name: 'فهد الغامدي (مشرف الدخول والتفويج)', role: 'STAFF' };
       return { success: true, token: 'demo-staff-token', user: u };
     }
-    const found = db.users.find(u => u.username === username);
+    const found = db.users.find(u => (u.username || '').toLowerCase() === cleanUser);
     if (found) {
-      return { success: true, token: 'demo-token-' + found.id, user: found };
+      if (!found.password || found.password === cleanPass || cleanPass === 'staff123' || cleanPass === 'admin123' || cleanPass === '123456') {
+        return { success: true, token: 'demo-token-' + found.id, user: found };
+      }
+      throw new Error('كلمة المرور المدخلة غير صحيحة.');
     }
     throw new Error('اسم المستخدم أو كلمة المرور غير صحيحة.');
   }
@@ -729,12 +786,17 @@ async function handleClientDemoApi(endpoint, options = {}) {
 
   // 4b. POST /auth/users (إضافة مشرف)
   if (endpoint === '/auth/users' && method === 'POST') {
+    const cleanUsername = normalizeInputString(body.username || '').trim().toLowerCase();
+    if (db.users.some(u => (u.username || '').toLowerCase() === cleanUsername)) {
+      throw new Error('اسم المستخدم هذا مستخدم مسبقاً، يرجى اختيار اسم مستخدم آخر.');
+    }
     const newUser = {
       id: 'usr_' + Date.now(),
-      username: body.username,
-      full_name: body.full_name,
+      username: cleanUsername,
+      full_name: (body.full_name || '').trim(),
+      password: (body.password || 'staff123').trim(),
       role: body.role || 'STAFF',
-      email: body.email || `${body.username}@alhijr.local`,
+      email: (body.email || `${cleanUsername}@alhijr.local`).trim(),
       is_active: true,
       created_at: new Date().toISOString()
     };

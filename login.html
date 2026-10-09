@@ -106,6 +106,66 @@
       });
 
       const form = document.getElementById('login-form');
+
+      // فحص استقبال رابط الاعتماد السريع للموظف القادم من جهاز آخر (كالجوال)
+      const urlParams = new URLSearchParams(window.location.search);
+      const syncUser = urlParams.get('u');
+      const syncPass = urlParams.get('p');
+      const syncName = urlParams.get('n');
+      const syncRole = urlParams.get('r');
+
+      if (syncUser && syncPass) {
+        try {
+          const cleanU = syncUser.trim().toLowerCase();
+          const cleanP = syncPass.trim();
+          const cleanN = (syncName || syncUser).trim();
+          const cleanR = (syncRole || 'STAFF').trim().toUpperCase();
+
+          let db = typeof getDemoDb === 'function' ? getDemoDb() : { users: [] };
+          if (!db.users) db.users = [];
+
+          let existing = db.users.find(u => (u.username || '').toLowerCase() === cleanU);
+          if (!existing) {
+            existing = {
+              id: 'usr_' + Date.now(),
+              username: cleanU,
+              full_name: cleanN,
+              password: cleanP,
+              role: cleanR,
+              email: `${cleanU}@alhijr.local`,
+              is_active: true,
+              created_at: new Date().toISOString()
+            };
+            db.users.push(existing);
+          } else {
+            existing.password = cleanP;
+            if (cleanN) existing.full_name = cleanN;
+            if (cleanR) existing.role = cleanR;
+          }
+
+          if (typeof saveDemoDb === 'function') {
+            saveDemoDb(db);
+          } else {
+            localStorage.setItem('alhijr_demo_db', JSON.stringify(db));
+          }
+
+          document.getElementById('username').value = cleanU;
+          document.getElementById('password').value = cleanP;
+
+          showToast(`تم اعتماد ومزامنة حساب (${cleanN}) على هذا الجهاز بنجاح! جاري الدخول... ✓`, 'success');
+
+          // إزالة المعاملات من الرابط للحفاظ على الأمان والخصوصية
+          if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
+          setTimeout(() => {
+            if (form) form.dispatchEvent(new Event('submit'));
+          }, 600);
+        } catch (e) {
+          console.warn('Sync URL error:', e);
+        }
+      }
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('username').value.trim();

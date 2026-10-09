@@ -455,16 +455,25 @@ async function loadUsersList() {
           <td style="font-size: 0.85rem; color: #64748B;">${u.created_at ? u.created_at.substring(0, 10) : '-'}</td>
           <td><span class="badge badge-success">نشط</span></td>
           <td>
-            ${isSelf 
-              ? '<span style="color: var(--text-muted); font-size: 0.82rem; font-weight: 600;">(حسابك الحالي)</span>' 
-              : `<button type="button" class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}', '${safeName}')" title="حذف هذا المستخدم من النظام">
-                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: middle; margin-left: 2px;">
-                     <polyline points="3 6 5 6 21 6"/>
-                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                   </svg>
-                   <span>حذف</span>
-                 </button>`
-            }
+            <div style="display: flex; gap: 6px; align-items: center; justify-content: flex-start; flex-wrap: wrap;">
+              <button type="button" class="btn btn-secondary btn-sm" onclick="copyStaffLoginLink('${u.username}', '${u.password || 'staff123'}', '${safeName}', '${u.role}')" title="نسخ رابط دخول واعتماد هذا الموظف لفتحه على اللابتوب أو إرساله له">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-left: 2px;">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                <span>رابط اللابتوب</span>
+              </button>
+              ${isSelf 
+                ? '<span style="color: var(--text-muted); font-size: 0.8rem; font-weight: 600;">(حسابك)</span>' 
+                : `<button type="button" class="btn btn-danger btn-sm" onclick="deleteUser('${u.id}', '${safeName}')" title="حذف هذا المستخدم من النظام">
+                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align: middle; margin-left: 2px;">
+                       <polyline points="3 6 5 6 21 6"/>
+                       <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                     </svg>
+                     <span>حذف</span>
+                   </button>`
+              }
+            </div>
           </td>
         </tr>
       `;
@@ -473,6 +482,31 @@ async function loadUsersList() {
     showToast('فشل جلب قائمة المستخدمين.', 'error');
   }
 }
+
+// دالة توليد ونسخ رابط الدخول والاعتماد السريع للموظف ليعمل على أي جهاز (مثل اللابتوب)
+async function copyStaffLoginLink(username, password, fullName, role) {
+  try {
+    const loc = window.location;
+    const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+    const loginUrl = `${loc.origin}${basePath}login.html?u=${encodeURIComponent(username)}&p=${encodeURIComponent(password || 'staff123')}&n=${encodeURIComponent(fullName || username)}&r=${encodeURIComponent(role || 'STAFF')}`;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(loginUrl);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = loginUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    showToast(`تم نسخ رابط الدخول والاعتماد لحساب (${fullName}) بنجاح! افتحه على اللابتوب وسيفتح حسابه فوراً بنقرة واحدة ✓`, 'success');
+  } catch (err) {
+    showToast('فشل نسخ الرابط: ' + err.message, 'error');
+  }
+}
+
+window.copyStaffLoginLink = copyStaffLoginLink;
 
 // دالة حذف المستخدم (للمدير فقط)
 async function deleteUser(userId, userName) {
@@ -620,10 +654,11 @@ function setupModalsAndActions() {
         method: 'POST',
         body: JSON.stringify(payload)
       });
-      showToast('تم إنشاء المستخدم بنجاح.', 'success');
       userModal.classList.remove('active');
       document.getElementById('create-user-form').reset();
       loadUsersList();
+      showToast('تم إنشاء الموظف بنجاح! تم نسخ رابط اعتماده للابتوب تلقائياً ✓', 'success');
+      copyStaffLoginLink(payload.username, payload.password, payload.full_name, payload.role);
     } catch (err) {
       showToast(err.message || 'فشل إنشاء المستخدم.', 'error');
     }
@@ -725,4 +760,141 @@ function setupModalsAndActions() {
       }
     });
   }
+
+  // =========================================================================
+  // مزامنة البيانات بين الأجهزة (الجوال / اللابتوب)
+  // =========================================================================
+  const syncModal = document.getElementById('modal-device-sync');
+  const btnOpenSync = document.getElementById('btn-open-sync-modal');
+  const btnCloseSync = document.getElementById('btn-close-sync-modal');
+  const btnAbortSync = document.getElementById('btn-abort-sync-modal');
+
+  const tabSyncExport = document.getElementById('tab-btn-sync-export');
+  const tabSyncImport = document.getElementById('tab-btn-sync-import');
+  const panelSyncExport = document.getElementById('sync-panel-export');
+  const panelSyncImport = document.getElementById('sync-panel-import');
+
+  const btnCopySync = document.getElementById('btn-copy-sync-code');
+  const btnApplySync = document.getElementById('btn-apply-sync-code');
+  const syncOutput = document.getElementById('sync-code-output');
+  const syncInput = document.getElementById('sync-code-input');
+
+  function setSyncTab(mode) {
+    if (mode === 'export') {
+      if (tabSyncExport) { tabSyncExport.className = 'btn btn-sm btn-primary'; }
+      if (tabSyncImport) { tabSyncImport.className = 'btn btn-sm btn-secondary'; }
+      if (panelSyncExport) panelSyncExport.style.display = 'block';
+      if (panelSyncImport) panelSyncImport.style.display = 'none';
+    } else {
+      if (tabSyncExport) { tabSyncExport.className = 'btn btn-sm btn-secondary'; }
+      if (tabSyncImport) { tabSyncImport.className = 'btn btn-sm btn-primary'; }
+      if (panelSyncExport) panelSyncExport.style.display = 'none';
+      if (panelSyncImport) panelSyncImport.style.display = 'block';
+    }
+  }
+
+  if (tabSyncExport) tabSyncExport.addEventListener('click', () => setSyncTab('export'));
+  if (tabSyncImport) tabSyncImport.addEventListener('click', () => setSyncTab('import'));
+
+  if (btnOpenSync && syncModal) {
+    btnOpenSync.addEventListener('click', () => {
+      setSyncTab('export');
+      syncModal.classList.add('active');
+      // توليد الرمز تلقائياً فور فتح المودال
+      try {
+        const db = typeof getDemoDb === 'function' ? getDemoDb() : {};
+        if (syncOutput) syncOutput.value = encodeSyncPayload(db);
+      } catch (e) {
+        console.warn('Sync code auto-generation notice:', e);
+      }
+    });
+  }
+
+  if (btnCloseSync && syncModal) btnCloseSync.addEventListener('click', () => syncModal.classList.remove('active'));
+  if (btnAbortSync && syncModal) btnAbortSync.addEventListener('click', () => syncModal.classList.remove('active'));
+
+  // زر توليد ونسخ كود المزامنة
+  if (btnCopySync) {
+    btnCopySync.addEventListener('click', async () => {
+      try {
+        const db = typeof getDemoDb === 'function' ? getDemoDb() : {};
+        const code = encodeSyncPayload(db);
+        if (syncOutput) {
+          syncOutput.value = code;
+          syncOutput.select();
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(code);
+        } else if (syncOutput) {
+          document.execCommand('copy');
+        }
+
+        showToast('تم نسخ رمز المزامنة بنجاح! يمكنك الآن إرساله لجهازك الآخر (اللابتوب) ولصقه هناك ✓', 'success');
+      } catch (err) {
+        showToast('فشل نسخ الرمز تلقائياً، يرجى تحديده ونسخه يدوياً: ' + err.message, 'error');
+      }
+    });
+  }
+
+  // زر تطبيق كود المزامنة
+  if (btnApplySync) {
+    btnApplySync.addEventListener('click', () => {
+      const code = syncInput ? syncInput.value.trim() : '';
+      if (!code) {
+        showToast('يرجى لصق رمز المزامنة في المربع أولاً.', 'warning');
+        return;
+      }
+
+      try {
+        const parsed = parseSyncPayload(code);
+        if (!parsed || (!parsed.users && !parsed.bookings)) {
+          throw new Error('رمز المزامنة غير صالح أو لا يحتوي على بيانات للمنصة.');
+        }
+
+        if (typeof saveDemoDb === 'function') {
+          saveDemoDb(parsed);
+        } else {
+          localStorage.setItem('alhijr_demo_db', JSON.stringify(parsed));
+        }
+
+        showToast('تمت مزامنة وتحديث بيانات المشرفين والحجوزات على هذا الجهاز بنجاح! ✓', 'success');
+        if (syncModal) syncModal.classList.remove('active');
+        if (syncInput) syncInput.value = '';
+
+        loadUsersList();
+        loadDashboardStats();
+        loadBookingsList(1);
+        loadAppointmentsList();
+      } catch (err) {
+        showToast('فشل تطبيق رمز المزامنة: ' + err.message, 'error');
+      }
+    });
+  }
+}
+
+// دالتان مساعِدتان لتشفير وفك تشفير بيانات المزامنة بنصوص UTF-8 بأمان
+function encodeSyncPayload(dataObj) {
+  const jsonStr = JSON.stringify(dataObj);
+  const utf8Bytes = new TextEncoder().encode(jsonStr);
+  let binary = '';
+  for (let i = 0; i < utf8Bytes.length; i++) {
+    binary += String.fromCharCode(utf8Bytes[i]);
+  }
+  return btoa(binary);
+}
+
+function parseSyncPayload(inputStr) {
+  const trimmed = (inputStr || '').trim();
+  if (!trimmed) throw new Error('الرمز فارغ.');
+  if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+    return JSON.parse(trimmed);
+  }
+  const binary = atob(trimmed);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  const jsonStr = new TextDecoder().decode(bytes);
+  return JSON.parse(jsonStr);
 }
