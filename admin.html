@@ -668,24 +668,14 @@
 
       <!-- ================= 6. تبويب المستخدمين والمشرفين ================= -->
       <section id="tab-users" class="admin-tab-pane admin-only" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
           <div>
             <h2 style="font-size: 1.8rem; margin-bottom: 4px;">إدارة المشرفين وصلاحيات الدخول</h2>
             <p style="color: var(--text-muted); font-size: 0.95rem;">إنشاء وإدارة حسابات مسؤولي البوابات وموظفي التنظيم</p>
           </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button id="btn-open-sync-modal" class="btn btn-gold btn-sm" title="مزامنة بيانات الموظفين والحجوزات بين الجوال واللابتوب">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-left: 4px;">
-                <polyline points="23 4 23 10 17 10"/>
-                <polyline points="1 20 1 14 7 14"/>
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-              </svg>
-              <span>🔄 مزامنة الجوال واللابتوب</span>
-            </button>
-            <button id="btn-open-create-user-modal" class="btn btn-primary btn-sm">
-              + إضافة موظف جديد
-            </button>
-          </div>
+          <button id="btn-open-create-user-modal" class="btn btn-primary btn-sm">
+            + إضافة موظف جديد
+          </button>
         </div>
 
         <div class="data-table-container">
@@ -845,63 +835,6 @@
           <button type="submit" class="btn btn-primary">إنشاء الحساب</button>
         </div>
       </form>
-  <!-- مودال مزامنة البيانات بين الجوال واللابتوب -->
-  <div class="modal-overlay" id="modal-device-sync">
-    <div class="modal-content" style="max-width: 580px;">
-      <div class="modal-header">
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 1.3rem;">🔄</span>
-          <h3 style="margin: 0;">مزامنة البيانات بين الجوال واللابتوب</h3>
-        </div>
-        <button type="button" class="btn-close-modal" id="btn-close-sync-modal">&times;</button>
-      </div>
-      <div class="modal-body" style="font-size: 0.93rem; line-height: 1.6;">
-        <div class="alert alert-info" style="margin-bottom: 18px; padding: 12px 14px; background: rgba(13, 59, 46, 0.06); border-right: 4px solid var(--primary); border-radius: 8px;">
-          <strong>💡 لماذا المزامنة؟</strong><br>
-          نظراً لأن الموقع مستضاف على GitHub Pages كصفحات ثابتة، تحفظ بيانات الموظفين الجدد في متصفح الجهاز الذي أُضيفت منه (الجوال). تتيح لك هذه الأداة نقل الحسابات والموظفين فورياً إلى اللابتوب أو أي جهاز آخر بكل سهولة.
-        </div>
-
-        <!-- أزرار التبديل: تصدير من هذا الجهاز / استيراد إلى هذا الجهاز -->
-        <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
-          <button type="button" id="tab-btn-sync-export" class="btn btn-sm btn-primary" style="flex: 1;">
-            📤 تصدير من هذا الجهاز (للجوال مثلاً)
-          </button>
-          <button type="button" id="tab-btn-sync-import" class="btn btn-sm btn-secondary" style="flex: 1;">
-            📥 استيراد إلى هذا الجهاز (للابتوب مثلاً)
-          </button>
-        </div>
-
-        <!-- لوحة 1: تصدير رمز المزامنة (تُستخدم من الجوال) -->
-        <div id="sync-panel-export">
-          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 10px;">
-            اضغط الزر أدناه لتوليد ونسخ كود المزامنة، ثم أرسله لنفسك (عبر واتساب أو الملاحظات) وافتحه في اللابتوب:
-          </p>
-          <div class="form-group">
-            <label class="form-label">رمز المزامنة السريعة (مشفر):</label>
-            <textarea id="sync-code-output" class="form-control" rows="4" readonly style="font-family: monospace; font-size: 0.82rem; direction: ltr; text-align: left; background: #F8F9FA; word-break: break-all;" placeholder="اضغط زر توليد ونسخ رمز المزامنة..."></textarea>
-          </div>
-          <button type="button" id="btn-copy-sync-code" class="btn btn-gold btn-block">
-            📋 توليد ونسخ رمز المزامنة الآن
-          </button>
-        </div>
-
-        <!-- لوحة 2: استيراد رمز المزامنة (تُستخدم من اللابتوب) -->
-        <div id="sync-panel-import" style="display: none;">
-          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 10px;">
-            الصق رمز المزامنة الذي نسخته من الجوال هنا لتحديث حسابات الموظفين والحجوزات على اللابتوب فوراً:
-          </p>
-          <div class="form-group">
-            <label class="form-label">الصق رمز المزامنة هنا:</label>
-            <textarea id="sync-code-input" class="form-control" rows="4" style="font-family: monospace; font-size: 0.82rem; direction: ltr; text-align: left;" placeholder="الصق الرمز المنسوخ من الجوال هنا..."></textarea>
-          </div>
-          <button type="button" id="btn-apply-sync-code" class="btn btn-primary btn-block">
-            ✓ تطبيق المزامنة وتحديث بيانات هذا الجهاز
-          </button>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="btn-abort-sync-modal">إغلاق</button>
-      </div>
     </div>
   </div>
 
