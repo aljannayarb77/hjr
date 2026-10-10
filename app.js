@@ -567,30 +567,63 @@ async function handleClientDemoApi(endpoint, options = {}) {
   if (endpoint.startsWith('/bookings/lookup') && method === 'POST') {
     const rawRef = normalizeInputString(body.booking_ref || '').toUpperCase();
     const rawPhone = normalizeInputString(body.phone || '').replace(/[\s\-_]/g, '');
+    const rawNatId = normalizeInputString(body.national_id || '').trim();
 
-    const b = db.bookings.find(x => {
+    if (!rawRef && !rawPhone && !rawNatId) {
+      throw new Error('يرجى إدخال رقم الحجز أو رقم الجوال أو رقم الهوية للاستعلام.');
+    }
+
+    const matches = db.bookings.filter(x => {
       const bRef = normalizeInputString(x.booking_ref || '').toUpperCase();
       const bPhone = normalizeInputString(x.phone || '').replace(/[\s\-_]/g, '');
       const bNatId = normalizeInputString(x.national_id || '').trim();
 
-      // فحص تطابق رقم الحجز
-      let refMatches = (bRef === rawRef);
-      if (!refMatches && rawRef.length >= 4) {
-        const refDigits = bRef.replace(/\D/g, '');
-        const inDigits = rawRef.replace(/\D/g, '');
-        if (inDigits.length >= 4 && refDigits.endsWith(inDigits)) {
-          refMatches = true;
+      // فحص تطابق رقم الحجز إذا تم إدخاله
+      if (rawRef) {
+        let refMatches = (bRef === rawRef);
+        if (!refMatches && rawRef.length >= 4) {
+          const refDigits = bRef.replace(/\D/g, '');
+          const inDigits = rawRef.replace(/\D/g, '');
+          if (inDigits.length >= 4 && refDigits.endsWith(inDigits)) {
+            refMatches = true;
+          }
         }
+        if (!refMatches) return false;
       }
 
-      // فحص تطابق رقم الجوال أو الهوية
-      const phoneMatches = (bPhone === rawPhone || bPhone.endsWith(rawPhone) || rawPhone.endsWith(bPhone) || bNatId === rawPhone);
+      // فحص تطابق رقم الجوال إذا تم إدخاله
+      if (rawPhone) {
+        const phoneMatches = (bPhone === rawPhone || bPhone.endsWith(rawPhone) || rawPhone.endsWith(bPhone));
+        if (!phoneMatches) return false;
+      }
 
-      return refMatches && phoneMatches;
+      // فحص تطابق رقم الهوية إذا تم إدخاله
+      if (rawNatId) {
+        const idMatches = (bNatId.toLowerCase() === rawNatId.toLowerCase());
+        if (!idMatches) return false;
+      }
+
+      return true;
     });
 
-    if (!b) throw new Error('لم يتم العثور على أي حجز مطابق لبيانات الاستعلام المدخلة.');
-    return { success: true, booking: b };
+    if (!matches || matches.length === 0) {
+      throw new Error('لم يتم العثور على أي حجز مطابق لبيانات الاستعلام المدخلة.');
+    }
+
+    // ترتيب الحجوزات: المؤكد أولاً ثم الأحدث
+    const statusWeight = { CONFIRMED: 3, USED: 2, CANCELLED: 1 };
+    matches.sort((a, b) => {
+      const swA = statusWeight[a.status] || 0;
+      const swB = statusWeight[b.status] || 0;
+      if (swA !== swB) return swB - swA;
+      return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    });
+
+    return {
+      success: true,
+      booking: matches[0],
+      bookings: matches
+    };
   }
 
   // 2b. GET /bookings (قائمة الحجوزات للوحة التحكم مع الفلترة والبحث والترقيم)

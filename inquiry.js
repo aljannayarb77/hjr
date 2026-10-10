@@ -7,10 +7,11 @@ let currentBooking = null;
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
 
-  // فحص ما إذا كان الرابط يحتوي على معلمات ref و phone للبحث الفوري
+  // فحص ما إذا كان الرابط يحتوي على معلمات ref أو phone أو national_id للبحث الفوري
   const urlParams = new URLSearchParams(window.location.search);
-  const ref = urlParams.get('ref');
-  const phone = urlParams.get('phone');
+  const ref = urlParams.get('ref') || '';
+  const phone = urlParams.get('phone') || '';
+  const nationalId = urlParams.get('national_id') || urlParams.get('id') || '';
 
   if (ref) {
     document.getElementById('lookup_ref').value = ref;
@@ -18,8 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (phone) {
     document.getElementById('lookup_phone').value = phone;
   }
-  if (ref && phone) {
-    performLookup(ref, phone);
+  if (nationalId) {
+    document.getElementById('lookup_national_id').value = nationalId;
+  }
+  if (ref || phone || nationalId) {
+    performLookup(ref, phone, nationalId);
   }
 });
 
@@ -29,11 +33,21 @@ function setupEventListeners() {
     e.preventDefault();
     const ref = document.getElementById('lookup_ref').value.trim();
     const phone = document.getElementById('lookup_phone').value.trim();
-    performLookup(ref, phone);
+    const nationalId = document.getElementById('lookup_national_id').value.trim();
+
+    if (!ref && !phone && !nationalId) {
+      showToast('يرجى إدخال رقم الحجز أو رقم الجوال أو رقم الهوية للبحث.', 'warning');
+      document.getElementById('lookup_ref').focus();
+      return;
+    }
+
+    performLookup(ref, phone, nationalId);
   });
 
   document.getElementById('btn-new-search').addEventListener('click', () => {
     document.getElementById('result-ticket-section').style.display = 'none';
+    const multiSec = document.getElementById('multiple-bookings-section');
+    if (multiSec) multiSec.style.display = 'none';
     document.getElementById('search-card').style.display = 'block';
     document.getElementById('not-found-msg').style.display = 'none';
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -88,7 +102,7 @@ function setupEventListeners() {
 }
 
 // تنفيذ الاستعلام
-async function performLookup(ref, phone) {
+async function performLookup(ref, phone, nationalId) {
   const notFoundEl = document.getElementById('not-found-msg');
   const searchBtn = document.getElementById('btn-search');
 
@@ -99,11 +113,18 @@ async function performLookup(ref, phone) {
   try {
     const data = await apiRequest('/bookings/lookup', {
       method: 'POST',
-      body: JSON.stringify({ booking_ref: ref, phone })
+      body: JSON.stringify({ 
+        booking_ref: ref || '', 
+        phone: phone || '',
+        national_id: nationalId || ''
+      })
     });
 
     if (data.success && data.booking) {
       currentBooking = data.booking;
+      const allBookings = data.bookings || [data.booking];
+      setupMultipleBookingsSelector(allBookings, data.booking.id);
+
       renderTicketDetails(data.booking);
       document.getElementById('search-card').style.display = 'none';
       document.getElementById('result-ticket-section').style.display = 'block';
@@ -123,6 +144,56 @@ async function performLookup(ref, phone) {
       <span>بحث وعرض التذكرة</span>
     `;
   }
+}
+
+// إعداد مبدل الحجوزات عند العثور على أكثر من حجز لنفس المستعلم
+function setupMultipleBookingsSelector(bookings, selectedId) {
+  const multiSection = document.getElementById('multiple-bookings-section');
+  const countSpan = document.getElementById('multiple-bookings-count');
+  const listContainer = document.getElementById('multiple-bookings-list');
+
+  if (!multiSection || !listContainer) return;
+
+  if (!bookings || bookings.length <= 1) {
+    multiSection.style.display = 'none';
+    return;
+  }
+
+  countSpan.textContent = bookings.length;
+  multiSection.style.display = 'block';
+  listContainer.innerHTML = '';
+
+  bookings.forEach((b) => {
+    const isSelected = (b.id === selectedId || b.booking_ref === selectedId);
+    const app = b.appointment || {};
+    const itemBtn = document.createElement('button');
+    itemBtn.type = 'button';
+    itemBtn.className = `btn btn-sm ${isSelected ? 'btn-primary' : 'btn-secondary'}`;
+    itemBtn.style.padding = '8px 14px';
+    itemBtn.style.fontSize = '0.88rem';
+    itemBtn.style.borderRadius = 'var(--radius-sm)';
+    itemBtn.style.display = 'inline-flex';
+    itemBtn.style.alignItems = 'center';
+    itemBtn.style.gap = '6px';
+
+    let statusText = 'مؤكد';
+    if (b.status === 'USED') statusText = 'مستخدم';
+    if (b.status === 'CANCELLED') statusText = 'ملغى';
+
+    itemBtn.innerHTML = `
+      <strong>${b.booking_ref}</strong>
+      <span style="opacity: 0.85;">(${app.date || '-'} | ${statusText})</span>
+    `;
+
+    itemBtn.addEventListener('click', () => {
+      currentBooking = b;
+      setupMultipleBookingsSelector(bookings, b.id);
+      renderTicketDetails(b);
+      showToast(`تم عرض التذكرة ${b.booking_ref}`, 'info');
+    });
+
+    listContainer.appendChild(itemBtn);
+  });
 }
 
 // عرض بيانات التذكرة المسترجعة
